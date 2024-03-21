@@ -1,7 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import crypto from "node:crypto";
+import crypto from "crypto";
+import { avatarPlaceholder } from "../../utils/constants.js";
 
 const userSchema = new Schema(
     {
@@ -16,16 +17,15 @@ const userSchema = new Schema(
             lowercase: true,
             trim: true,
             unique: [true, "Username Already Exists"],
+            index: true,
         },
         password: {
             type: String,
             required: [true, "Password is Required"],
         },
-        dob: {
-            type: Date,
-        },
         avatar: {
             type: String,
+            default: avatarPlaceholder,
         },
         about: {
             type: String,
@@ -57,15 +57,17 @@ const userSchema = new Schema(
 
 userSchema.pre("save", async (next) => {
     if (!this.isModified("password")) return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
+    else {
+        this.password = await bcrypt.hash(this.password, 10);
+        next();
+    }
 });
 
 userSchema.methods.generateRefreshToken = async () => {
     const token = await jwt.sign(
         {
             _id: this._id,
-            name: this.name,
+            email: this.email,
             username: this.username,
         },
         process.env.REFRESH_TOKEN_SECRET,
@@ -80,7 +82,7 @@ userSchema.methods.generateAccessToken = async () => {
     const token = await jwt.sign(
         {
             _id: this._id,
-            name: this.name,
+            email: this.email,
             username: this.username,
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -92,12 +94,20 @@ userSchema.methods.generateAccessToken = async () => {
 };
 
 userSchema.methods.isPasswordCorrect = (password) => {
-    if (this.password == password) return true;
+    if (bcrypt.compare(password, this.password)) return true;
     else return false;
 };
 
-userSchema.methods.generateVerifiedEmail = () => {
-    const token = crypto.createHash("sha256").update(this.emailVerifyToken).digest("hex");
-    return token;
+userSchema.methods.generateVerifyEmailToken = () => {
+    const unHashedToken = crypto.randomBytes(30).toString("hex");
+
+    const hashedToken = crypto
+        .createHash("sha256")
+        .update(unHashedToken)
+        .digest("hex");
+
+    const tokenExpiry = Date.now() + process.env.VERIFY_EMAIL_TOKEN_EXPIRY;
+    return { unHashedToken, hashedToken, tokenExpiry };
 };
+
 export const User = mongoose.model("User", userSchema);
