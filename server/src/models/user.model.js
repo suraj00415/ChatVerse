@@ -2,7 +2,6 @@ import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { avatarPlaceholder } from "../../utils/constants.js";
 
 const userSchema = new Schema(
     {
@@ -10,6 +9,11 @@ const userSchema = new Schema(
             type: String,
             required: [true, "Name is Required"],
             trim: true,
+        },
+        email: {
+            type: String,
+            required: [true, "Email is Required"],
+            unique: true,
         },
         username: {
             type: String,
@@ -25,7 +29,13 @@ const userSchema = new Schema(
         },
         avatar: {
             type: String,
-            default: avatarPlaceholder,
+            default:
+                "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=740&t=st=1711037106~exp=1711037706~hmac=ab8ae30120b2a313e5333846fd30bf1de1cb3cb861b07153e295f4765b471b3d",
+        },
+        coverImage: {
+            type: String,
+            default:
+                "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=740&t=st=1711037106~exp=1711037706~hmac=ab8ae30120b2a313e5333846fd30bf1de1cb3cb861b07153e295f4765b471b3d",
         },
         about: {
             type: String,
@@ -55,12 +65,10 @@ const userSchema = new Schema(
     { timestamps: true }
 );
 
-userSchema.pre("save", async (next) => {
+userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
-    else {
-        this.password = await bcrypt.hash(this.password, 10);
-        next();
-    }
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
 });
 
 userSchema.methods.generateRefreshToken = async () => {
