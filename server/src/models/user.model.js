@@ -53,13 +53,15 @@ const userSchema = new Schema(
             type: String,
             default: null,
         },
+        emailVerifyTokenExpiry: {
+            type: Date,
+        },
         forgotPasswordToken: {
             type: String,
             default: null,
         },
         forgotPasswordExpiry: {
-            type: String,
-            defalult: null,
+            type: Date,
         },
     },
     { timestamps: true }
@@ -106,7 +108,7 @@ userSchema.methods.isPasswordCorrect = async function (password) {
     return isCorrect;
 };
 
-userSchema.methods.generateVerifyEmailToken = () => {
+userSchema.methods.generateVerifyEmailToken = function () {
     const unHashedToken = crypto.randomBytes(30).toString("hex");
 
     const hashedToken = crypto
@@ -114,7 +116,7 @@ userSchema.methods.generateVerifyEmailToken = () => {
         .update(unHashedToken)
         .digest("hex");
 
-    const tokenExpiry = Date.now() + process.env.VERIFY_EMAIL_TOKEN_EXPIRY;
+    const tokenExpiry = Number(Date.now()) + Number(process.env.VERIFY_EMAIL_TOKEN_EXPIRY);
     return { unHashedToken, hashedToken, tokenExpiry };
 };
 

@@ -5,6 +5,8 @@ import { asyncHandler } from "../utils/asynchHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { deleteFile } from "../utils/deleteFiles.js";
 import { option } from "../utils/constants.js";
+import { sendVerificationMail } from "../utils/Mails.js";
+import crypto from "crypto";
 
 const generateAccessRefreshToken = async (userid) => {
     try {
@@ -67,7 +69,6 @@ export const regeisterUser = asyncHandler(async (req, res) => {
 
     const avatarURL = avatar?.url;
     const coverImageURL = coverImage?.url;
-
     const newUser = await User.create({
         name,
         username,
@@ -76,13 +77,19 @@ export const regeisterUser = asyncHandler(async (req, res) => {
         avatar: avatarURL,
         coverImage: coverImageURL,
     });
+    const { unHashedToken, hashedToken, tokenExpiry } =
+        newUser.generateVerifyEmailToken();
+    newUser.emailVerifyToken = hashedToken;
+    newUser.emailVerifyTokenExpiry = tokenExpiry;
 
+    await newUser.save({ validateBeforeSave: false });
     const userCreated = await User.findById(newUser?._id).select(
         "-password -refreshToken"
     );
 
     if (!userCreated) throw new ApiError(400, "Error While Creating the User");
 
+    sendVerificationMail(userCreated, unHashedToken);
     deleteFile(avatarFileName);
     if (coverImageFileName.trim() !== "") {
         deleteFile(coverImageFileName);
@@ -125,4 +132,50 @@ export const loginUser = asyncHandler(async (req, res) => {
         );
 });
 
+export const verfiyEmail = asyncHandler(async (req, res) => {
+    const verifyEmailUnhashedToken = req.body.emailtoken;
 
+    const hashedToken = crypto
+        .createHash("sha256")
+        .update(verifyEmailUnhashedToken)
+        .digest("hex");
+
+    const user = await User.findById(req.user?._id);
+
+    if (user?.emailVerifyToken !== hashedToken)
+        throw new ApiError(401, "Invalid Email Verification Token");
+    if (Date.now() > user.emailVerifyTokenExpiry)
+        throw new ApiError(403, "Email Verification Token Expired");
+
+    user.isVerified = true;
+    user.emailVerifyToken = undefined;
+    user.emailVerifyTokenExpiry = undefined;
+    user.save({ validateBeforeSave: false });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Email Verified SuccessFully", user));
+});
+
+export const resendVerifyEmail = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user?._id);
+    if (!user) throw new ApiError(404, "User Does Not Exists");
+    if (user.isVerified) throw new ApiError(409, "User is Already Verified");
+    const { unHashedToken, hashedToken, tokenExpiry } =
+        user.generateVerifyEmailToken();
+
+    user.emailVerifyToken = hashedToken;
+    user.emailVerifyTokenExpiry = tokenExpiry;
+    await user.save({ validateBeforeSave: false });
+
+    sendVerificationMail(user, unHashedToken);
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Resended Email Verification Email SuccessFully",
+                {}
+            )
+        );
+});
