@@ -5,3 +5,8 @@ export const groupAvatarPlaceholder =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtVVOCm9OwNK1VdbNJ0MR3I1YXT2OZpk0U6A&usqp=CAU";
 
 export const port = process.env.PORT || 8081;
+
+export const option = {
+    secure: true,
+    httpOnly: true,
+};

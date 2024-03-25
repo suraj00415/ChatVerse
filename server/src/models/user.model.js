@@ -71,7 +71,7 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
-userSchema.methods.generateRefreshToken = async () => {
+userSchema.methods.generateRefreshToken = async function () {
     const token = await jwt.sign(
         {
             _id: this._id,
@@ -86,7 +86,7 @@ userSchema.methods.generateRefreshToken = async () => {
     return token;
 };
 
-userSchema.methods.generateAccessToken = async () => {
+userSchema.methods.generateAccessToken = async function () {
     const token = await jwt.sign(
         {
             _id: this._id,
@@ -95,15 +95,15 @@ userSchema.methods.generateAccessToken = async () => {
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn: ACCESS_TOKEN_EXPIRY,
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
         }
     );
     return token;
 };
 
-userSchema.methods.isPasswordCorrect = (password) => {
-    if (bcrypt.compare(password, this.password)) return true;
-    else return false;
+userSchema.methods.isPasswordCorrect = async function (password) {
+    const isCorrect = await bcrypt.compare(password, this.password);
+    return isCorrect;
 };
 
 userSchema.methods.generateVerifyEmailToken = () => {

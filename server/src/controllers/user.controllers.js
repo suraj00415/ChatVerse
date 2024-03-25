@@ -4,6 +4,20 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { deleteFile } from "../utils/deleteFiles.js";
+import { option } from "../utils/constants.js";
+
+const generateAccessRefreshToken = async (userid) => {
+    try {
+        const user = await User.findById(userid);
+        const refreshToken = await user.generateRefreshToken();
+        const accessToken = await user.generateAccessToken();
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+        return { accessToken, refreshToken };
+    } catch (error) {
+        throw new ApiError(500, error.message);
+    }
+};
 
 export const regeisterUser = asyncHandler(async (req, res) => {
     const { name, username, email, password } = req.body;
@@ -81,5 +95,34 @@ export const regeisterUser = asyncHandler(async (req, res) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    
+    if (!username && !password)
+        throw new ApiError(401, "Username and Password is Required");
+
+    const userExists = await User.findOne({ username });
+
+    if (!userExists) throw new ApiError(401, "User Does Not Exists");
+    const isPassCorrect = await userExists.isPasswordCorrect(password);
+    if (!isPassCorrect) throw new ApiError(401, "Incorrect credentials");
+
+    const { accessToken, refreshToken } = await generateAccessRefreshToken(
+        userExists?._id
+    );
+
+    const loggedInUser = await User.findById(userExists?._id).select(
+        "-password "
+    );
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, option)
+        .cookie("refreshToken", refreshToken, option)
+        .json(
+            new ApiResponse(200, "User LoggedIn Successfully", {
+                user: loggedInUser,
+                accessToken,
+                refreshToken,
+            })
+        );
 });
+
+
