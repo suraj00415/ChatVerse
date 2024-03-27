@@ -28,7 +28,7 @@ export const regeisterUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Required Fields is not filled");
 
     const existedUser = await User.findOne({
-        $or: [{ username }, { email }],
+        $or: [{ username }],
     });
 
     if (existedUser)
@@ -179,3 +179,17 @@ export const resendVerifyEmail = asyncHandler(async (req, res) => {
             )
         );
 });
+
+export const logoutUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user?._id);
+    if (!user) throw new ApiError(404, "User Does Not Exists");
+
+    user.refreshToken = undefined;
+    user.save({ validateBeforeSave: false });
+    return res
+        .clearCookie("accessToken", option)
+        .clearCookie("refreshToken", option)
+        .status(200)
+        .json(new ApiResponse(200, "User Logged Out SuccessFully", {}));
+});
+

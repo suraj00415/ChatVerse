@@ -8,7 +8,8 @@ export const sendVerificationMail = (user, unHashedToken) => {
         to: user?.email,
         subject: "User Verification Mail",
         html: `<p>Hello ${user?.name}, verify your email by clicking on this link...</p>
-        <a href='${process.env.CLIENT_URL}/verify-email?emailVerifyToken=${unHashedToken}'> Verify Your Email</a>`,
+        <a href='${process.env.CLIENT_URL}/verify-email?emailVerifyToken=${unHashedToken}'> Verify Your Email</a>
+        <p>The link will be activated for about 10 mins</p>`,
     };
 
     transporter.sendMail(message, (err, inf) => {
