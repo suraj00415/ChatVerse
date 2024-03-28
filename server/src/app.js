@@ -12,7 +12,7 @@ export const httpServer = createServer(app);
 const io = new Server(httpServer, {
     pingTimeout: 6000,
     cors: {
-        origin: "*",
+        origin: process.env.CORS_ORIGIN,
         credentials: true,
     },
 });
@@ -31,11 +31,8 @@ app.use(express.urlencoded({ limit: "30kb", extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
 
-
 import userRoutes from "./routes/user.routes.js";
 app.use("/api/v1/users", userRoutes);
 
-
-
-initializeSocket(io)
+initializeSocket(io);
 export default app;

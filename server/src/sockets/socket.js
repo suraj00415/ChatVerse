@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 export const initializeSocket = async (io) => {
     return io.on("connection", async (socket) => {
         try {
-            console.log("User Connected", socket.id);
             const token = socket.handshake.headers?.token;
             if (!token) throw new ApiError(401, "Unauthorized Access");
             const decodedToken = jwt.verify(
@@ -17,11 +16,43 @@ export const initializeSocket = async (io) => {
             );
             if (!user) throw new ApiError(404, "User Does Not Exists");
             socket.user = user;
-            socket.on("joinUser", (message) => {
-                console.log(message, socket.id);
+
+            console.log(
+                "User Connected 👌 ",
+                socket.id + " " + socket?.user?.name
+            );
+
+            socket.join(user._id.toString());
+            socket.emit("connected");
+
+            // joining the user to the chat room
+            socket.on("joinUser", (chatId) => {
+                console.log("User joined the Room :", chatId);
+                socket.join(chatId);
             });
+
+            // start typing
+            socket.on("startTyping", (chatId) => {
+                socket.in(chatId).emit("emitStartTyping", {
+                    chatId,
+                    _id: socket?.user?._id,
+                });
+            });
+
+            // stop typing
+            socket.on("stopTyping", (chatId) => {
+                socket
+                    .in(chatId)
+                    .emit("emitStopTyping", { chatId, _id: socket?.user?._id });
+            });
+
+            // disconnecting the user
             socket.on("disconnect", () => {
-                console.log("User Disconnected", socket.id + socket.user.name);
+                console.log(
+                    "User Disconnected ⚠️ ",
+                    socket.id + " ⚠️  " + socket?.user?.name
+                );
+                if (socket?.user?._id) socket.leave(socket?.user?._id);
             });
         } catch (error) {
             socket.emit(
@@ -33,3 +64,6 @@ export const initializeSocket = async (io) => {
     });
 };
 
+export const emitSocket = (req, chatId, eventName, payload) => {
+    req.app.get("io").in(chatId).emit(eventName, payload);
+};
