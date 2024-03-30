@@ -34,5 +34,10 @@ app.use(express.static("public"));
 import userRoutes from "./routes/user.routes.js";
 app.use("/api/v1/users", userRoutes);
 
+import chatRoutes from "./routes/chat.routes.js" 
+
+app.use("/api/v1/chats",chatRoutes)
+
+
 initializeSocket(io);
 export default app;

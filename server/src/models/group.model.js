@@ -1,18 +1,27 @@
-import mongoose, { Schema } from "mongoose"
-import { groupAvatarPlaceholder } from "../utils/constants"
+import mongoose, { Schema } from "mongoose";
+import { groupAvatarPlaceholder } from "../utils/constants.js";
 
-const groupSchema=new Schema({
-    avatar:{
-        type:String,
-        default:groupAvatarPlaceholder
+const groupSchema = new Schema({
+    name: {
+        type: String,
+        default: "Group",
     },
-    coverImage:{
-        type:String
+    avatar: {
+        type: String,
+        default: groupAvatarPlaceholder,
     },
-    description:{
-        type:String,
+    coverImage: {
+        type: String,
     },
-    links:[String]
-})
+    description: {
+        type: String,
+    },
+    links: [String],
 
-export const Group=mongoose.model("Group",groupSchema)
+    groupCreator: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+    },
+});
+
+export const Group = mongoose.model("Group", groupSchema);

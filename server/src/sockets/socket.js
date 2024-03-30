@@ -22,7 +22,7 @@ export const initializeSocket = async (io) => {
                 socket.id + " " + socket?.user?.name
             );
 
-            socket.join(user._id.toString());
+            socket.join(user?._id.toString());
             socket.emit("connected");
 
             // joining the user to the chat room
@@ -65,5 +65,7 @@ export const initializeSocket = async (io) => {
 };
 
 export const emitSocket = (req, chatId, eventName, payload) => {
+    console.log("socket-chat-new emited")
     req.app.get("io").in(chatId).emit(eventName, payload);
+    console.log("socket-chat-new completed")
 };
