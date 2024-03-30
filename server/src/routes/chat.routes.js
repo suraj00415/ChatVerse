@@ -3,11 +3,13 @@ import {
     addNewParticipantsInGroupChat,
     createGroup,
     createOneToOneChat,
+    deleteGroupChat,
+    leaveGroupChat,
     removeParticipantFromGroupChat,
 } from "../controllers/chat.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-const router = Router();
 
+const router = Router();
 router
     .route("/create-one-chat/:recieverId")
     .post(verifyJWT, createOneToOneChat);
@@ -20,5 +22,7 @@ router
 router
     .route("/participants/remove")
     .delete(verifyJWT, removeParticipantFromGroupChat);
+router.route("/leave-group/:chatId").delete(verifyJWT, leaveGroupChat);
+router.route("/delete-group/:chatId").delete(verifyJWT, deleteGroupChat);
 
 export default router;

@@ -354,3 +354,110 @@ export const removeParticipantFromGroupChat = asyncHandler(async (req, res) => {
             new ApiResponse(200, "Participants Removed SuccessFully", chat[0])
         );
 });
+
+export const leaveGroupChat = asyncHandler(async (req, res) => {
+    const { chatId } = req.params;
+
+    if (!chatId) throw new ApiError(400, "ChatId Not Found");
+
+    if (!isValidObjectId(chatId)) throw new ApiError(400, "Invalid ChatId");
+
+    const groupChat = await Chat.findById(chatId);
+    if (!groupChat) throw new ApiError(404, "Group Chat Does Not Exits");
+
+    if (!groupChat.participants.includes(req.user?._id))
+        throw new ApiError(404, "User Not Present In The Group");
+    if (
+        groupChat.admins.length === 1 &&
+        groupChat.admins.includes(req.user?._id)
+    )
+        throw new ApiError(
+            400,
+            "This Group Has Only 1 Admin So You Cannot Leave the Group"
+        );
+    let updatedGroup;
+
+    if (!groupChat.admins.includes(req.user?._id)) {
+        updatedGroup = await Chat.findByIdAndUpdate(chatId, {
+            $pull: {
+                participants: req.user?._id,
+            },
+        });
+    } else {
+        updatedGroup = await Chat.findByIdAndUpdate(chatId, {
+            $pull: {
+                participants: req.user?._id,
+            },
+            $pull: {
+                admins: req.user?._id,
+            },
+        });
+    }
+    if (!updatedGroup)
+        throw new ApiError(500, "Something Went Wrong While Leaving The Group");
+    const chat = await Chat.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(chatId),
+            },
+        },
+        ...grouChatAggregation(),
+    ]);
+    if (!chat.length)
+        throw new ApiError(
+            500,
+            "Something Went Wrong While Leaving the Group Chat"
+        );
+
+    emitSocket(req, req.user?._id.toString(), "leaveChat", chat[0]);
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Leaved Group Chat SuccessFully", chat[0]));
+});
+
+export const deleteGroupChat = asyncHandler(async (req, res) => {
+    const { chatId } = req.params;
+    if (!chatId) throw new ApiError(400, "ChatId is Required");
+
+    if (!isValidObjectId(chatId)) throw new ApiError(403, "Invalid ChatId");
+
+    const groupChat = await Chat.findById(chatId);
+    if (!groupChat) throw new ApiError(404, "Chat Group Does note exists");
+
+    if (!groupChat.admins.includes(req.user?._id))
+        throw new ApiError(
+            401,
+            "Unauthorized Access To Delete The Group. Requires Admin Permissions"
+        );
+    const payload = await Chat.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(chatId),
+            },
+        },
+        ...grouChatAggregation(),
+    ]);
+    const chat = await Chat.findByIdAndDelete(chatId);
+    const group = await Group.findByIdAndDelete(groupChat.Group);
+    if (!chat || !group)
+        throw new ApiError(
+            500,
+            "Something Went Wrong While Deleting The Group"
+        );
+
+    groupChat?.participants?.forEach((id) => {
+        emitSocket(req, id.toString(), "leaveChat", payload);
+    });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Group Chat Deleted SuccessFully", payload));
+});
+
+// deleteGroupChat,
+// deleteOneOnOneChat,
+// getAllChats,
+// getGroupChatDetails,
+// renameGroupChat,
+// searchAvailableUsers,
