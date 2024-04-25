@@ -1,0 +1,82 @@
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
+import { useLogoutMutation } from "@/features/auth/authApi";
+import { selectCurrentUser, setLogout } from "@/features/auth/authSlice";
+import { RiChatNewFill } from "react-icons/ri";
+import { SlOptionsVertical } from "react-icons/sl";
+import { useDispatch, useSelector } from "react-redux";
+import GroupAdd from "./GroupAdd";
+import { useNavigate } from "react-router-dom";
+import { useLogout } from "@/hooks/useLogout";
+
+
+export default function () {
+    const { toast } = useToast()
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const logout=useLogout()
+    const user = useSelector(selectCurrentUser)
+
+    return (
+        <div className='bg-zinc-900 p-2'>
+            <div className='flex justify-between gap-2 items-center'>
+                {/* logo */}
+                <div>
+                    <div >
+                        <img className='w-[50px] h-auto rounded-full' src={user?.avatar} alt="" />
+                    </div>
+                </div>
+                <div>
+                    <div className="font-extrabold text-2xl bg-gradient-to-r from-lime-400 to-emerald-400 bg-clip-text text-transparent">ChatVerse</div>
+                </div>
+                {/*  */}
+                <div className="flex justify-center items-center gap-7">
+                    {/* new Chat */}
+                    {/* <Dialog>
+                        <DialogTrigger className="z-30  p-1 rounded-full"><RiChatNewFill className="h-7 cursor-pointer w-auto   text-white " /></DialogTrigger>
+                        <DialogContent className="h-[600px] w-[1000px]" >
+                            <DialogHeader className="h-full">
+                                <DialogTitle>Start New Chat?</DialogTitle>
+                                <DialogDescription className="h-full w-full " >
+                                    <GroupAdd />
+                                </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog> */}
+                    <div className="z-30  p-2 rounded-full hover:bg-zinc-700 cursor-pointer" onClick={() => navigate('/add')}>
+                        <RiChatNewFill className="h-6  w-auto   text-white " />
+                    </div>
+                    {/* options */}
+                    <div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className='outline-none rounded-full hover:bg-zinc-700 cursor-pointer p-2'><SlOptionsVertical className='h-4 rounded-full w-auto' /></DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                                <DropdownMenuItem>Billing</DropdownMenuItem>
+                                <DropdownMenuItem>Team</DropdownMenuItem>
+                                <DropdownMenuItem>Subscription</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
