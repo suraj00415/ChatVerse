@@ -1,12 +1,13 @@
+import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { LogoutOption, option } from "../utils/constants.js";
 import { deleteFile } from "../utils/deleteFiles.js";
-import { option } from "../utils/constants.js";
 import { sendVerificationMail } from "../utils/Mails.js";
-import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 const generateAccessRefreshToken = async (userid) => {
     try {
@@ -79,9 +80,10 @@ export const regeisterUser = asyncHandler(async (req, res) => {
     });
     const { unHashedToken, hashedToken, tokenExpiry } =
         newUser.generateVerifyEmailToken();
+    const color = newUser.generateUserColors();
     newUser.emailVerifyToken = hashedToken;
     newUser.emailVerifyTokenExpiry = tokenExpiry;
-
+    newUser.color = color;
     await newUser.save({ validateBeforeSave: false });
     const userCreated = await User.findById(newUser?._id).select(
         "-password -refreshToken"
@@ -142,6 +144,11 @@ export const verfiyEmail = asyncHandler(async (req, res) => {
 
     const user = await User.findById(req.user?._id);
 
+    if (user?.isVerified)
+        return res
+            .status(200)
+            .json(new ApiResponse(202, "User Already Verified", []));
+
     if (user?.emailVerifyToken !== hashedToken)
         throw new ApiError(401, "Invalid Email Verification Token");
     if (Date.now() > user.emailVerifyTokenExpiry)
@@ -186,9 +193,66 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
     user.refreshToken = undefined;
     user.save({ validateBeforeSave: false });
+
     return res
-        .clearCookie("accessToken", option)
-        .clearCookie("refreshToken", option)
+        .clearCookie("accessToken", LogoutOption)
+        .clearCookie("refreshToken", LogoutOption)
         .status(200)
         .json(new ApiResponse(200, "User Logged Out SuccessFully", {}));
+});
+
+export const updateAvatar = asyncHandler(async (req, res) => {
+    const avatarFileMulter = req.file;
+    if (!avatarFileMulter) throw new ApiError(400, "Avatar File Is Required");
+
+    const avatarFile = avatarFileMulter?.filename;
+
+    if (!avatarFile) throw new ApiError(400, "File Name Not Found");
+    const avatarPath = avatarFileMulter?.path;
+    if (!avatarPath) throw new ApiError(400, "Avatar Path Not Found");
+
+    const data = await uploadOnCloudinary(avatarPath);
+    const user = await User.findById(req.user?._id.toString());
+    if (!data?.url)
+        throw new ApiError(
+            500,
+            "Something Went Wrong While Updating The avatar file on cloudinary"
+        );
+    user.avatar = data.url;
+    user.save({ validateBeforeSave: false });
+    deleteFile(avatarFile);
+    return res.json(new ApiResponse(200, "Avatar Updated SuccessFully", user));
+});
+
+export const refreshToken = asyncHandler(async (req, res) => {
+    try {
+        const incomingRefreshToken =
+            req.cookies.refreshToken || req.body.refreshToken;
+        if (!incomingRefreshToken)
+            throw new ApiError(401, "Unauthorized Access");
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+        const user = await User.findById(decodedToken?._id);
+        if (!user) throw new ApiError(400, "Invalid Refresh Token");
+
+        if (incomingRefreshToken == !user.refreshToken)
+            throw new ApiError(400, "Refresh Token is Expired or Used");
+
+        const { refreshToken: newRefreshToken, accessToken } =
+            await generateAccessRefreshToken(user._id);
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, option)
+            .cookie("refreshToken", newRefreshToken, option)
+            .json(
+                new ApiResponse(200, "Access Token Refreshed", {
+                    accessToken,
+                    refreshToken: newRefreshToken,
+                })
+            );
+    } catch (error) {
+        throw new ApiError(401, error.message || "Invalid Refresh Token");
+    }
 });

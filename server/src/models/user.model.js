@@ -2,6 +2,8 @@ import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { isBlackOrWhite } from "../utils/constants.js";
+
 
 const userSchema = new Schema(
     {
@@ -62,6 +64,9 @@ const userSchema = new Schema(
         forgotPasswordExpiry: {
             type: Date,
         },
+        color: {
+            type: String,
+        },
     },
     { timestamps: true }
 );
@@ -71,6 +76,18 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
+
+userSchema.methods.generateUserColors = function () {
+    var letters = "0123456789ABCDEF";
+    var color = "#";
+    do {
+        color = "#";
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+    } while (isBlackOrWhite(color));
+    return color;
+};
 
 userSchema.methods.generateRefreshToken = async function () {
     const token = await jwt.sign(
@@ -115,7 +132,8 @@ userSchema.methods.generateVerifyEmailToken = function () {
         .update(unHashedToken)
         .digest("hex");
 
-    const tokenExpiry = Number(Date.now()) + Number(process.env.VERIFY_EMAIL_TOKEN_EXPIRY);
+    const tokenExpiry =
+        Number(Date.now()) + Number(process.env.VERIFY_EMAIL_TOKEN_EXPIRY);
     return { unHashedToken, hashedToken, tokenExpiry };
 };
 

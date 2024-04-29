@@ -36,14 +36,17 @@ export const initializeSocket = async (io) => {
                 socket.in(chatId).emit("emitStartTyping", {
                     chatId,
                     _id: socket?.user?._id,
+                    user: socket?.user,
                 });
             });
 
             // stop typing
             socket.on("stopTyping", (chatId) => {
-                socket
-                    .in(chatId)
-                    .emit("emitStopTyping", { chatId, _id: socket?.user?._id });
+                socket.in(chatId).emit("emitStopTyping", {
+                    chatId,
+                    _id: socket?.user?._id,
+                    user: socket?.user,
+                });
             });
 
             // disconnecting the user
@@ -65,7 +68,7 @@ export const initializeSocket = async (io) => {
 };
 
 export const emitSocket = (req, chatId, eventName, payload) => {
-    console.log("socket-chat-new emited")
+    console.log("socket-chat-new emited");
     req.app.get("io").in(chatId).emit(eventName, payload);
-    console.log("socket-chat-new completed")
+    console.log("socket-chat-new completed");
 };

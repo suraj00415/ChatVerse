@@ -7,8 +7,11 @@ import { asyncHandler } from "../utils/asynchHandler.js";
 import mongoose from "mongoose";
 import { emitSocket } from "../sockets/socket.js";
 import { Group } from "../models/group.model.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { groupAvatarPlaceholder } from "../utils/constants.js";
+import { deleteFile } from "../utils/deleteFiles.js";
 
-const chatAggregation = () => {
+export const chatAggregation = () => {
     return [
         {
             $lookup: {
@@ -48,10 +51,48 @@ const chatAggregation = () => {
                 ],
             },
         },
+        {
+            $lookup: {
+                from: "messages",
+                foreignField: "_id",
+                localField: "lastmessage",
+                as: "lastmessage",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            foreignField: "_id",
+                            localField: "sender",
+                            as: "sender",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        username: 1,
+                                        avatar: 1,
+                                        email: 1,
+                                        name: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $addFields: {
+                            sender: { $first: "$sender" },
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                lastmessage: { $first: "$lastmessage" },
+            },
+        },
     ];
 };
 
-const grouChatAggregation = () => {
+export const grouChatAggregation = () => {
     return [
         ...chatAggregation(),
         {
@@ -176,11 +217,19 @@ export const createOneToOneChat = asyncHandler(async (req, res) => {
 });
 
 export const createGroup = asyncHandler(async (req, res) => {
-    const { name, participants } = req.body;
-    if (!name || !participants.length)
-        throw new ApiError(400, "Name and Participants are Required");
+    const { name, participants, description } = req.body;
+    const groupAvatar = req?.file;
+    const participantArray = participants?.split(',');
+    console.log(participantArray);
+    if (!name || !participantArray.length || !description)
+        throw new ApiError(
+            400,
+            "Name , Description and Participants are Required"
+        );
 
-    const members = [...new Set([...participants, req.user?._id.toString()])];
+    const members = [
+        ...new Set([...participantArray, req.user?._id.toString()]),
+    ];
     if (members?.length < 3)
         throw new ApiError(403, "Group Should have at least 3 members");
 
@@ -193,7 +242,25 @@ export const createGroup = asyncHandler(async (req, res) => {
     ]);
     if (isGroupExisted.length) throw new ApiError(403, "Group Already Created");
 
-    const group = await Group.create({ name, groupCreator: req.user?._id });
+    let groupAvatarUrl = groupAvatarPlaceholder;
+
+    if (groupAvatar && groupAvatar?.path) {
+        console.log("insidegroupavatar");
+        const response = await uploadOnCloudinary(groupAvatar?.path);
+        if (response?.url) groupAvatarUrl = response?.url;
+        else
+            throw new ApiError(
+                500,
+                "Something Went Wrong While Uploading On cloudinary"
+            );
+    }
+
+    const group = await Group.create({
+        name,
+        groupCreator: req.user?._id,
+        avatar: groupAvatarUrl,
+        description,
+    });
     const groupCreated = await Group.findById(group?._id);
     if (!groupCreated)
         throw new ApiError(500, "Something Went Wrong While Creating Group");
@@ -223,7 +290,9 @@ export const createGroup = asyncHandler(async (req, res) => {
         if (id == req.user?._id.toString()) return;
         emitSocket(req, id, "newChat", groupChat[0]);
     });
-
+    if (groupAvatar && groupAvatar?.filename) {
+        deleteFile(groupAvatar?.filename);
+    }
     return res
         .status(201)
         .json(
@@ -455,9 +524,97 @@ export const deleteGroupChat = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, "Group Chat Deleted SuccessFully", payload));
 });
 
-// deleteGroupChat,
-// deleteOneOnOneChat,
-// getAllChats,
-// getGroupChatDetails,
-// renameGroupChat,
-// searchAvailableUsers,
+export const delteOneToOneChat = asyncHandler(async (req, res) => {
+    const { chatId } = req.params;
+    if (!chatId) throw new ApiError(400, "ChatId is Required");
+
+    if (!isValidObjectId(chatId)) throw new ApiError(400, "Invalid ChatId");
+    const chat = await Chat.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(chatId),
+            },
+        },
+        ...chatAggregation(),
+    ]);
+    if (!chat.length) throw new ApiError(404, "Chat Does Not Exists");
+    await Chat.findByIdAndDelete(chatId);
+    const otherParticipant = chat[0]?.participants?.find((participant) => {
+        return req.user?._id.toString() !== participant?._id;
+    });
+
+    emitSocket(req, otherParticipant?._id, "leaveChat", chat[0]);
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "One To One Chat Deleted", chat[0]));
+});
+
+export const getAllChats = asyncHandler(async (req, res) => {
+    const chat = await Chat.aggregate([
+        {
+            $match: {
+                participants: req.user?._id,
+            },
+        },
+        ...grouChatAggregation(),
+        {
+            $sort:{
+                lastmessage:-1
+            }
+        }
+    ]);
+
+    if (!chat.length) throw new ApiError(400, "No Data To Show");
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "All Chats Fetched SuccessFully", chat));
+});
+
+export const searchAvailableUsers = asyncHandler(async (req, res) => {
+    let query = " ";
+    if (req.params?.query) {
+        query = req.params?.query;
+    }
+    const users = await User.aggregate([
+        {
+            $match: {
+                $and: [
+                    {
+                        _id: {
+                            $ne: req.user._id,
+                        },
+                    },
+                    {
+                        $or: [
+                            {
+                                name: {
+                                    $regex: query,
+                                    $options: "i",
+                                },
+                            },
+                            {
+                                username: {
+                                    $regex: query,
+                                    $options: "i",
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        {
+            $project: {
+                avatar: 1,
+                name: 1,
+                username: 1,
+                email: 1,
+            },
+        },
+    ]);
+    if (!users.length) throw new ApiError(404, "No Users Found");
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "Users fetched successfully", users));
+});

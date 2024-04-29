@@ -9,4 +9,13 @@ export const port = process.env.PORT || 8081;
 export const option = {
     secure: true,
     httpOnly: true,
+    expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
 };
+export const LogoutOption = {
+    secure: true,
+    httpOnly: true,
+};
+
+export function isBlackOrWhite(color) {
+    return /^#(?:00){3}$|^#(?:ff){3}$/i.test(color);
+}
