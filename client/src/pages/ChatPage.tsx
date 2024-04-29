@@ -3,7 +3,7 @@ import { selectCurrentToken, selectCurrentUser } from '@/features/auth/authSlice
 import { useGetAllChatQuery } from '@/features/chat/chatApi'
 import { selectAllChats, selectCurrentChat, selectSearchChats, setAllChat, setCurrentChat, setOtherParicipantChat, setSearchChats } from '@/features/chat/chatSlice'
 import { useGetMessageQuery } from '@/features/messages/messageApi'
-import { selectCurrentChatMessages, selectUnreadMessage, setCurrentChatMessasges, setUreadMessage } from '@/features/messages/messageSlice'
+import { selectCurrentChatMessages, selectUnreadMessage, setCurrentChatMessasges, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage, setUreadMessage } from '@/features/messages/messageSlice'
 import ChatBottomBar from '@/myComponents/Chat/ChatBottomBar'
 import ChatHeading from '@/myComponents/Chat/ChatHeading'
 import ChatHeadingTop from '@/myComponents/Chat/ChatHeadingTop'
@@ -156,6 +156,10 @@ export default function ChatPage() {
                             const message_person_name = d?.lastmessage?.sender?._id === user?._id ? "You" : d?.lastmessage?.sender?.name
                             return (
                                 <div onClick={() => {
+                                    dispatch(setReplyMessage(null))
+                                    dispatch(setIsSelectionOpen(false))
+                                    dispatch(setSelectedMessage([]))
+                                    dispatch(setReplyOpen(false))
                                     dispatch(setCurrentChat(d))
                                     dispatch(setOtherParicipantChat(otherParticipant))
                                 }} key={i}>

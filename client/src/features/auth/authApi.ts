@@ -68,8 +68,27 @@ export const authSlice = apiSlice.injectEndpoints({
                 };
             },
             invalidatesTags: ["User"]
+        }),
+        verifyUser: builder.mutation({
+            query: (token) => {
+                return {
+                    url: '/users/verify-email',
+                    method: 'POST',
+                    body: { emailtoken: token },
+                };
+            },
+            invalidatesTags: ["User"]
+        }),
+        resendVerifyUser: builder.mutation({
+            query: () => {
+                return {
+                    url: '/users/resend/verify-email',
+                    method: 'POST',
+                };
+            },
+            invalidatesTags: ["User"]
         })
     })
 })
 
-export const { useLoginMutation, useLogoutMutation, useRegisterUserMutation, useUpdateAccountMutation, useUpdateAvatarMutation, useUpdateCoverImageMutation } = authSlice
+export const { useLoginMutation, useLogoutMutation, useRegisterUserMutation, useUpdateAccountMutation, useUpdateAvatarMutation, useUpdateCoverImageMutation, useVerifyUserMutation, useResendVerifyUserMutation } = authSlice

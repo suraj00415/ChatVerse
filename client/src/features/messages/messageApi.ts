@@ -24,7 +24,22 @@ export const messageSlice = apiSlice.injectEndpoints({
             },
             invalidatesTags: ["Message", "Chat"]
         }),
+        replyMessage: builder.mutation({
+            query: (formData) => {
+                const formDataBody = new FormData();
+                Object.keys(formData).forEach(key => {
+                    formDataBody.append(key, formData[key]);
+                });
+                return {
+                    url: '/messages/reply-message',
+                    method: 'POST',
+                    body: formDataBody,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
     })
 })
 
-export const { useGetMessageQuery, useSendMessageMutation } = messageSlice
+export const { useGetMessageQuery, useSendMessageMutation, useReplyMessageMutation } = messageSlice

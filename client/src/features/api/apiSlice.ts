@@ -23,13 +23,13 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         console.log(refreshResult)
         if (refreshResult?.data) {
             const user = api?.getState()?.auth?.user
-            console.log("Inside Repeated Query")
             if (user) {
-                api.dispatch(setCredientials({ token: refreshResult.data?.data?.accessToken, user }))
+                api.dispatch(setCredientials({data:{ accessToken: refreshResult.data?.data?.accessToken, user }}))
             }
             result = await baseQuery(args, api, extraOptions)
         }
         else {
+            console.log("Looged out")
             api.dispatch(setLogout())
         }
     }
@@ -39,5 +39,5 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 export const apiSlice = createApi({
     baseQuery: baseQueryWithReauth,
     endpoints: builder => ({}),
-    tagTypes: ["User","Chat","Message","Group"]
+    tagTypes: ["User", "Chat", "Message", "Group"]
 })

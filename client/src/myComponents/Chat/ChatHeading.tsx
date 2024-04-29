@@ -9,6 +9,8 @@ import {
 import { selectUnreadMessage, setFilterUnreadMessge } from "@/features/messages/messageSlice";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
+
+
 export default function ChatHeading({ imageSrc, name, message, message_person_name, msgTime, messageCount, chatId }) {
     const unreadMessage = useSelector(selectUnreadMessage)
     // const currentChat = useSelector(selectCurrentChat) 
@@ -19,6 +21,7 @@ export default function ChatHeading({ imageSrc, name, message, message_person_na
         })
         dispatch(setFilterUnreadMessge(filteredUnreadMessage))
     }
+
     return (
         chatId && name &&
         (<div className='max-w-[420px] w-full cursor-pointer hover:bg-zinc-800 pr-2' onClick={() => filterUnreadMessgeHandler(chatId)}>
@@ -35,20 +38,19 @@ export default function ChatHeading({ imageSrc, name, message, message_person_na
                         <div className='font-bold text-lg'>{name}</div>
                         {/* msg */}
                         <div className='flex gap-1 '>
-                            {message_person_name && <div>{message_person_name}</div>}
+                            {message_person_name && <div className="">{message_person_name?.length > 12 ?message_person_name?.substring(0,12) +"..": message_person_name}</div>}
                             {message_person_name && <div>:</div>}
-                            {message_person_name && message && <div className="">{message?.length > 30 ? message?.substring(0, 25) + "..." : message}</div>}
+                            {message_person_name && message && <div className="">{message?.length > 20 ? message?.substring(0, 20) + "..." : message}</div>}
                             {!message_person_name && !message && <div>No New Message To Display</div>}
                         </div>
                     </div>
                     <div className='flex flex-col gap-1'>
                         {/* time ,notifiy,mute */}
-                        <div className='text-sm'>
+                        <div className='text-sm truncate '>
                             {/* time */}
                             {msgTime}
                         </div>
                         <div className='w-full flex justify-center items-center gap-2'>
-
                             {/* notify */}
                             {messageCount > 0 && <div className='w-[50%]'>
                                 <div className='text-center text-xs p-1 font-bold text-black bg-lime-400 rounded-full'>

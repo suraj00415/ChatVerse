@@ -34,6 +34,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import MoreInfo from "./MoreInfo";
 import { useEffect } from "react";
 import { useDeleteGroupMutation } from "@/features/chat/chatApi";
+import { setIsSelectionOpen } from "@/features/messages/messageSlice";
 
 export default function ChatTopBar({ typing, typingData }) {
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function ChatTopBar({ typing, typingData }) {
       if (i < 6 && participant?._id !== user?._id) {
         participantsName = participantsName + ", " + participant?.name
       }
-      else if (i >= 6 && currentChat?.participants?.length >= 7) {
+      else if (i >= 6 && i < 7 && currentChat?.participants?.length >= 7) {
         participantsName = participantsName + ", more...."
       }
       else return
@@ -118,7 +119,7 @@ export default function ChatTopBar({ typing, typingData }) {
                 <DropdownMenuContent className="">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => dispatch(setIsSelectionOpen(true))} >Select Messages</DropdownMenuItem>
                   <DropdownMenuItem>Billing</DropdownMenuItem>
                   <DropdownMenuItem>Team</DropdownMenuItem>
                   {isAdmin && currentChat?.isGroup && <DropdownMenuItem >

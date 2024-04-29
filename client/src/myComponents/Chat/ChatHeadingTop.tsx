@@ -1,12 +1,4 @@
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -14,20 +6,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/components/ui/use-toast";
-import { useLogoutMutation } from "@/features/auth/authApi";
-import { selectCurrentUser, setLogout } from "@/features/auth/authSlice";
+import { selectCurrentUser } from "@/features/auth/authSlice";
+import { useLogout } from "@/hooks/useLogout";
 import { RiChatNewFill } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
-import { useDispatch, useSelector } from "react-redux";
-import GroupAdd from "./GroupAdd";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useLogout } from "@/hooks/useLogout";
 
 
 export default function () {
-    const { toast } = useToast()
-    const dispatch = useDispatch()
     const navigate = useNavigate()
     const logout=useLogout()
     const user = useSelector(selectCurrentUser)
