@@ -29,8 +29,8 @@
   height: 15px;
   width: 15px;
   background-color: #323131;
-  border: 1px solid greenyellow;
-  border-radius: 100%;
+  border: 2px solid greenyellow;
+  border-radius: 20%;
 }
 
 /* On mouse-over, add a grey background color */

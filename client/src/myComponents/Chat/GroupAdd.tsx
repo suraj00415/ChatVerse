@@ -102,11 +102,9 @@ export default function GroupAdd() {
     }, [isLoading])
     return (
         <>
-
             {<div className='w-full h-full flex justify-center items-center '>
                 <form onSubmit={handleSubmit(onSubmitHandler)}>
                     <div className='flex p-3 h-full items-center justify-center'>
-
                         <div className='  w-[100%]  bg-zinc-800 gap-10 flex flex-col-reverse lg:flex-row justify-around py-7 rounded-md px-8 '>
                             <div className="">
                                 <div className="font-medium mb-2">

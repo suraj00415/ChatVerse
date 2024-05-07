@@ -48,7 +48,7 @@ export default function Register() {
             })
         } catch (error: any) {
             console.log(error)
-            toast({ title: error?.data?.message || error?.error })
+            toast({ title: error?.data?.message || error?.error,variant:"destructive" })
         }
     }
     useEffect(() => {

@@ -11,6 +11,7 @@ const persistConfig = {
     storage,
     // blacklist: []
 };
+
 const appReducer = combineReducers({
     [apiSlice.reducerPath]: apiSlice.reducer,
     auth: authSlice,

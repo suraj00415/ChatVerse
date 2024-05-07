@@ -12,6 +12,16 @@ import { IoMdClose } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import { RiShareForwardFill } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import UsersList from './UsersList';
+
 
 
 export default function ChatBottomBar({ socket }) {
@@ -163,9 +173,19 @@ export default function ChatBottomBar({ socket }) {
                 <div className='bg-zinc-900 cursor-pointer '  >
                   <FaStar className='h-9 hover:opacity-75 text-zinc-300 w-auto rounded-full p-1 border-2  hover:bg-zinc-700' />
                 </div>
-                <div className='bg-zinc-900 cursor-pointer' onClick={sendMessageHandler}>
-                  <RiShareForwardFill className='h-9 hover:opacity-75 text-zinc-300 w-auto rounded-full p-1 border-2  hover:bg-zinc-700' />
-                </div>
+                <Dialog>
+                  <DialogTrigger><div className='bg-zinc-900 cursor-pointer'>
+                    <RiShareForwardFill className='h-9 hover:opacity-75 text-zinc-300 w-auto rounded-full p-1 border-2  hover:bg-zinc-700' />
+                  </div></DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Forward Message To :</DialogTitle>
+                      <DialogDescription>
+                        <UsersList />
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>

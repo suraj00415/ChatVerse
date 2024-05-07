@@ -27,7 +27,6 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
   const selectedMessages = useSelector(selectSelectedMessage)
   useEffect(() => {
     scrollToBottom();
-
   }, [currentChatMessage, isMessageFetching, isReplyOpen]);
 
   const scrollToBottom = () => {
@@ -93,7 +92,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
                 return (
                   <>
                     {newDate && (
-                      <div className={`flex justify-center sticky top-3 my-2 z-20`} key={data?._id + "abc"} >
+                      <div className={`flex justify-center sticky top-3 my-2 mt-4 z-20`} key={data?._id + "abc"} >
                         <div className='bg-zinc-800 flex justify-center py-1 w-[40%] sm:w-[27%] md:w-[20%] lg:w-[15%] xl:w-[10%] rounded-lg text-lime-400 text-sm font-medium border border-zinc-700 '>
                           {messageDate}
                         </div>
@@ -101,7 +100,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
                     )}
                     <div
                       style={{ backgroundColor: `${isSelectionOpen && selectedMessages.includes(data?._id) ? "rgba(106, 109, 122, 0.42)" : ""}` }}
-                      className={` ${isSelectionOpen ? "cursor-pointer" : ""} flex  items-center mt-1 rounded-lg `}
+                      className={` ${isSelectionOpen ? "cursor-pointer pr-2" : ""} flex  items-center mt-1 rounded-lg `}
                       onClick={toggleCheckbox}
                       onMouseEnter={(e) => { if (isSelectionOpen) { e.currentTarget.classList.add('backGroundOp', 'opacity-80'); } }}
                       onMouseLeave={(e) => { if (isSelectionOpen) { e.currentTarget.classList.remove('backGroundOp', 'opacity-80'); } }}
@@ -112,10 +111,11 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
 
                       <div
                         key={data?._id}
-                        className={`${isPrevSender && !newDate ? "" : "mt-2"}  w-full `}>
+                        className={`${isPrevSender && !newDate ? "" : "mt-3"}  w-full `}>
                         <div className='flex flex-col '>
                           <div className={`${isSender ? 'self-end' : 'self-start'}`}>
                             <ChatSimple
+                            isForwarded={data?.isForwarded}
                               message={data?.content}
                               isSender={isSender}
                               isGroup={currentChat?.isGroup}
@@ -134,8 +134,6 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
                         </div>
                       </div>
                     </div>
-
-
                   </>
                 )
               })
