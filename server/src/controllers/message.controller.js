@@ -255,6 +255,102 @@ export const sendReplyMessage = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, "Message Sent SuccessFully", messages[0]));
 });
 
-export const forwardMessage = asyncHandler(async (req, res) => {});
+export const forwardMessage = asyncHandler(async (req, res) => {
+    const messageIds = req.body?.messageIds;
+    const chatIds = req.body?.chatIds;
+    let chats = [];
+    try {
+        chats = await Chat.find({
+            _id: {
+                $in: chatIds,
+            },
+        });
+    } catch (error) {
+        throw new ApiError(400, "Invalid ChatID");
+    }
+    if (!chats.length) throw new ApiError(404, "Chats Does Not Exists");
+    if (chats.length > 5)
+        throw new ApiError(
+            400,
+            "You can Forward Messages to only 5 groups/chats at a time ."
+        );
+
+    let messagesExisted = [];
+    try {
+        messagesExisted = await Message.find({
+            _id: {
+                $in: messageIds,
+            },
+        });
+    } catch (error) {
+        throw new ApiError(400, "Invalid Message Ids" || error);
+    }
+
+    if (!messagesExisted.length)
+        throw new ApiError(404, "Messages Does Not Exists");
+    let messageId = [];
+
+    await Promise.all(
+        chats.map(async (chat) => {
+            await Promise.all(
+                messagesExisted.map(async (message) => {
+                    const messageNew = await Message.create({
+                        sender: req.user?._id,
+                        content: message.content,
+                        chat: chat._id,
+                        forwardCount: message.forwardCount + 1 || 1,
+                        forwardSource: message.forwardSource || message.sender,
+                        isForwarded: true,
+                        attachments: message.attachments,
+                    });
+                    if (!messageNew) {
+                        throw new ApiError(
+                            400,
+                            "Message Not Created Successfully in ForwardMessage"
+                        );
+                    }
+                    messageId.push(messageNew._id);
+                })
+            );
+        })
+    );
+
+    console.log(messageId);
+    const aggMessage = await Message.aggregate([
+        {
+            $match: {
+                _id: {
+                    $in: messageId,
+                },
+            },
+        },
+        ...messageAggregation(),
+    ]);
+    if (!aggMessage.length)
+        throw new ApiError(
+            400,
+            "Error While Finding Message in the aggregate "
+        );
+    chats.forEach((chat) => {
+        chat.participants.forEach((parrticipantId) => {
+            if (parrticipantId.toString() === req.user?._id?.toString()) return;
+            aggMessage.forEach((mess, i) => {
+                console.log("Mess Chat",mess?.chat)
+                console.log("chats?._id.toString()",chats?._id?.toString())
+                if (mess?.chat.toString() === chat?._id?.toString()) {
+                    emitSocket(
+                        req,
+                        parrticipantId.toString(),
+                        "newMessage",
+                        mess
+                    );
+                }
+            });
+        });
+    });
+
+    return res.status(200).json(new ApiResponse(200, "fetched", aggMessage));
+});
+
 export const forwardBulkMessage = asyncHandler(async (req, res) => {});
 export const deleteBulkMessage = asyncHandler(async (req, res) => {});

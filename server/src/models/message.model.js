@@ -25,6 +25,18 @@ const messageSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Message",
         },
+        isForwarded: {
+            type: Boolean,
+            default: false,
+        },
+        forwardSource: {
+            type: Schema.Types.ObjectId,
+            ref: "Message",
+        },
+        forwardCount: {
+            type: Number,
+            default: 0,
+        },
     },
     { timestamps: true }
 );

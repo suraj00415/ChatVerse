@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+    forwardMessage,
     getAllMessages,
     sendMessage,
     sendReplyMessage,
@@ -17,6 +18,8 @@ router
     );
 
 router.route("/get-message/:chatId").get(verifyJWT, getAllMessages);
+
+router.route("/forward-message").post(verifyJWT, forwardMessage);
 
 router
     .route("/reply-message")
