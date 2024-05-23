@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import { apiSlice } from "./api/apiSlice";
+import { apiSlice } from "./chat/api/apiSlice";
 import authSlice from "./auth/authSlice";
 import chatSlice from "./chat/chatSlice";
 import messageSlice from "./messages/messageSlice";
