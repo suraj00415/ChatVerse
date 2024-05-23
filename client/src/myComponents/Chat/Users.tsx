@@ -1,23 +1,16 @@
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { toast } from '@/components/ui/use-toast'
-import { selectCurrentUser } from '@/features/auth/authSlice'
-import { selectAllChats } from '@/features/chat/chatSlice'
-import { useForwardMessageMutation } from '@/features/messages/messageApi'
-import { selectSelectedMessage, setIsSelectionOpen, setSelectedMessage } from '@/features/messages/messageSlice'
-import { useEffect, useState } from 'react'
-import { IoClose, IoSend } from 'react-icons/io5'
-import { useDispatch, useSelector } from 'react-redux'
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { selectCurrentUser } from '@/features/auth/authSlice';
+import { selectAllChats } from '@/features/chat/chatSlice';
+import { selectSelectedMessage } from '@/features/messages/messageSlice';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-
-export default function UsersList() {
+export default function Users() {
     const [values, setValues] = useState("")
     const [members, setMembers] = useState([])
     const chats = useSelector(selectAllChats);
     const [data, setData] = useState(chats)
-    const selectedMessages = useSelector(selectSelectedMessage)
     const user = useSelector(selectCurrentUser)
-    const [forward] = useForwardMessageMutation()
-    const dispatch = useDispatch() 
     useEffect(() => {
         const setDataVal = chats?.filter((chat) => {
             if (!members.some((mem) => mem?._id === chat?._id)) return chat
@@ -33,18 +26,6 @@ export default function UsersList() {
         }))
     }, [values, members])
 
-    const forwardHandler = async () => {
-        const memberIds = members.map((member) => member?._id)
-        try {
-            const response = await forward({ messageIds: selectedMessages, chatIds: memberIds }).unwrap()
-            dispatch(setSelectedMessage([]))
-            dispatch(setIsSelectionOpen(false))
-            toast({ title: "Message Forwarded Successfully" })
-        } catch (error) {
-            console.log("Error:", error)
-            toast({ title: error?.data?.message, variant: "destructive" })
-        }
-    }
     const removeMember = (userId) => {
         setMembers(() => {
             return members?.filter((user) => {
@@ -53,12 +34,12 @@ export default function UsersList() {
         })
     }
     return (
-        <>
+        <div className=''>
             <div className='w-full mt-2'>
                 <div className="w-full mt-4]">
                     <input placeholder="Search Chats" value={values} onChange={(e) => setValues(e.target.value)} type="text" className="w-full p-2 bg-zinc-900 rounded-md" />
                 </div>
-                <ScrollArea className="h-[300px] w-auto  rounded-md bg-zinc-900 mt-2 p-4">
+                <ScrollArea className="h-[300px] w-auto  rounded-md bg-zinc-900 mt-2 p-4 ">
                     <div className="">
                         {
                             data && data?.map((chat, i) => {
@@ -123,21 +104,6 @@ export default function UsersList() {
                     </div>
                 </ScrollArea>
             </div>
-            <div>
-                <div className="h-[50px] w-auto mt-2 p-4 flex items-center justify-between">
-                    <div className='font-bold text-[1.01rem] text-white'>
-                        Send {selectedMessages?.length} Messages
-                    </div>
-                    {
-                        members?.length > 0 && members.length <= 5 && <div className=' cursor-pointer' >
-                            <IoSend className='h-9 hover:opacity-75 text-zinc-300 w-auto rounded-full p-1 border-2  hover:bg-zinc-700' onClick={forwardHandler} />
-                        </div>
-                    }
-                    {members.length > 5 && <div className='text-red-400 font-semibold'>
-                        Cannot Send to more than 5 Chats
-                    </div>}
-                </div>
-            </div>
-        </>
+        </div>
     )
 }

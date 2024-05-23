@@ -39,7 +39,22 @@ export const messageSlice = apiSlice.injectEndpoints({
             },
             invalidatesTags: ["Message", "Chat"]
         }),
+        forwardMessage: builder.mutation({
+            query: (formData) => {
+                // const formDataBody = new FormData();
+                // Object.keys(formData).forEach(key => {
+                //     formDataBody.append(key, formData[key]);
+                // });
+                return {
+                    url: '/messages/forward-message',
+                    method: 'POST',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
     })
 })
 
-export const { useGetMessageQuery, useSendMessageMutation, useReplyMessageMutation } = messageSlice
+export const { useGetMessageQuery, useSendMessageMutation, useReplyMessageMutation, useForwardMessageMutation } = messageSlice

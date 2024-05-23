@@ -1,17 +1,3 @@
-import { BsEmojiSmile } from 'react-icons/bs';
-import { IoMdAdd } from 'react-icons/io';
-import { IoSend } from "react-icons/io5";
-
-import { selectCurrentChat } from '@/features/chat/chatSlice';
-import { useReplyMessageMutation, useSendMessageMutation } from '@/features/messages/messageApi';
-import { selectCurrentChatMessages, selectIsReplyOpen, selectIsSelectionOpen, selectReplyMessage, selectSelectedMessage, setCurrentChatMessasges, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage } from '@/features/messages/messageSlice';
-import EmojiPicker from 'emoji-picker-react';
-import { useEffect, useRef, useState } from 'react';
-import { FaStar } from "react-icons/fa6";
-import { IoMdClose } from "react-icons/io";
-import { MdDelete } from "react-icons/md";
-import { RiShareForwardFill } from "react-icons/ri";
-import { useDispatch, useSelector } from 'react-redux';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +5,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { selectCurrentChat } from '@/features/chat/chatSlice';
+import { useReplyMessageMutation, useSendMessageMutation } from '@/features/messages/messageApi';
+import { selectCurrentChatMessages, selectIsReplyOpen, selectIsSelectionOpen, selectReplyMessage, selectSelectedMessage, setCurrentChatMessasges, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage } from '@/features/messages/messageSlice';
+import EmojiPicker from 'emoji-picker-react';
+import { useEffect, useRef, useState } from 'react';
+import { BsEmojiSmile } from 'react-icons/bs';
+import { FaStar } from "react-icons/fa6";
+import { IoMdAdd, IoMdClose } from 'react-icons/io';
+import { IoSend } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
+import { RiShareForwardFill } from "react-icons/ri";
+import { useDispatch, useSelector } from 'react-redux';
 import UsersList from './UsersList';
 
 
@@ -34,22 +32,21 @@ export default function ChatBottomBar({ socket }) {
   const replyMessage = useSelector(selectReplyMessage)
   const isSelectionOpen = useSelector(selectIsSelectionOpen)
   const selectedMessages = useSelector(selectSelectedMessage)
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (emojiPickerRef.current && !emojiPickerRef.current?.contains(event.target)) {
         setShowEmoji(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  const [sendMessage, { isLoading }] = useSendMessageMutation()
-  const [replyMessages, { isLoading: replyMessasgeLoading }] = useReplyMessageMutation()
-
+  const [sendMessage] = useSendMessageMutation()
+  const [replyMessages] = useReplyMessageMutation()
   const currentChat = useSelector(selectCurrentChat)
 
   const sendMessageHandler = async (e) => {
@@ -119,7 +116,7 @@ export default function ChatBottomBar({ socket }) {
                 <div className='bg-zinc-900 cursor-pointer relative ' ref={emojiPickerRef} >
                   <BsEmojiSmile className='h-9 hover:opacity-75 text-zinc-400 w-auto rounded-full  border-2  hover:bg-zinc-700' onClick={() => setShowEmoji(!showEmoji)} />
                   {showEmoji && <div className='bottom-14 left-7 absolute '>
-                    <EmojiPicker theme='dark' emojiStyle='google' onEmojiClick={(e) => {
+                    <EmojiPicker theme='dark' emojiStyle='facebook' onEmojiClick={(e) => {
                       setValue((prev) => prev + e.emoji)
                     }} />
                   </div>}

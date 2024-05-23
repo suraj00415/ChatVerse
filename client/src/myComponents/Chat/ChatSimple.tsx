@@ -11,8 +11,9 @@ import moment from 'moment';
 import { FaChevronDown } from "react-icons/fa";
 import { useDispatch } from 'react-redux';
 import { TiArrowForward } from "react-icons/ti";
+import { memo } from "react";
 
-export default function ChatSimple({ isForwarded,message, isSender, isGroup, senderName, timeAgo, newDate, isPrevSender, color, messageData, replyToContent, replyToColor, replyToName, isReply }) {
+const ChatSimple=function ({ isForwarded,message, isSender, isGroup, senderName, timeAgo, newDate, isPrevSender, color, messageData, replyToContent, replyToColor, replyToName, isReply }) {
     const URL_REGEX = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm;
     const dispatch = useDispatch()
     const replyHandler = (data) => {
@@ -85,3 +86,5 @@ export default function ChatSimple({ isForwarded,message, isSender, isGroup, sen
         </div>
     )
 }
+
+export default memo(ChatSimple)

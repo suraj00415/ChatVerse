@@ -1,4 +1,3 @@
-import React from 'react'
 import { IoIosSearch } from 'react-icons/io'
 import { IoArrowBack } from 'react-icons/io5'
 

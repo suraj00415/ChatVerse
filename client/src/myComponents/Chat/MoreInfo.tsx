@@ -1,9 +1,20 @@
 import { selectCurrentUser } from '@/features/auth/authSlice'
 import { selectCurrentChat, selectOtherParticipants } from '@/features/chat/chatSlice'
-import React from 'react'
+import moment from 'moment'
 import { IoIosSearch } from 'react-icons/io'
+import { RiAdminFill } from "react-icons/ri"
+import { TbUsersPlus } from "react-icons/tb"
 import { useSelector } from 'react-redux'
-import moment from 'moment';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import Users from './Users'
+
 
 export default function MoreInfo() {
     const currentChat = useSelector(selectCurrentChat)
@@ -16,7 +27,7 @@ export default function MoreInfo() {
     }
     return (
         <div className='text-white w-full'>
-            <div className='flex justify-center flex-col items-center gap-10 w-full'>
+            <div className='flex justify-center flex-col items-center gap-7 w-full'>
                 <div>
                     <img className="rounded-full h-52" src={currentChat?.isGroup ? currentChat?.Group?.avatar : otherParticipant?.avatar} alt="" />
                 </div>
@@ -45,6 +56,46 @@ export default function MoreInfo() {
                                 </div>
                             </div>
                         </div>
+                    )
+                }
+                {currentChat?.isGroup &&
+                    (
+                        <Dialog >
+                            <DialogTrigger className='w-full flex justify-between items-center hover:bg-zinc-800 bg-zinc-900 p-3 cursor-pointer rounded-md'>
+                                <div className='font-bold '>Add/Remove Admin</div>
+                                <div ><RiAdminFill className='text-lime-400 h-6 w-auto' /></div>
+                            </DialogTrigger>
+                            <DialogContent className='w-[800px] min-w-[800px]'>
+                                <DialogHeader className='w-full'>
+                                    <DialogTitle>Add Admins :</DialogTitle>
+                                    <DialogDescription className=''>
+                                        <div className='flex w-full gap-10'>
+                                            <Users />
+                                            <Users />
+                                        </div>
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    )
+                }
+                {currentChat?.isGroup &&
+                    (
+                        <Dialog>
+                            <DialogTrigger className='w-full flex justify-between items-center hover:bg-zinc-800 bg-zinc-900 p-3 cursor-pointer rounded-md'>
+                                <div className='font-bold '>Add/Remove Members</div>
+                                <div ><TbUsersPlus className='text-lime-400 h-6 w-auto' /></div>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                                    <DialogDescription>
+                                        This action cannot be undone. This will permanently delete your account
+                                        and remove your data from our servers.
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                     )
                 }
                 {currentChat?.isGroup && (<div className='w-full '>

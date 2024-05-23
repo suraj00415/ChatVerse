@@ -96,10 +96,10 @@ export default function ChatTopBar({ typing, typingData }) {
                   </div>
                 </div>
               </SheetTrigger>
-              <SheetContent className="overflow-y-scroll w-[1000px]">
+              <SheetContent className="overflow-y-scroll">
                 <SheetHeader className="w-full">
                   <SheetTitle>{currentChat?.isGroup ? "Group Info" : "Personal Info"}</SheetTitle>
-                  <SheetDescription className="w-full">
+                  <SheetDescription className="">
                     {/* This action cannot be undone. This will permanently delete your account
                   and remove your data from our servers. */}
                     <MoreInfo />
