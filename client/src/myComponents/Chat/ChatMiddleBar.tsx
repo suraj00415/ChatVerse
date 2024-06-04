@@ -10,6 +10,7 @@ import chatFiller from '/assets/chatting-33.svg';
 import chatFiller2 from '/assets/conversation-13.svg';
 import CheckboxComponent from '../Checkbox/CheckboxComponent';
 import "./opacity.css";
+import ChatImage from './ChatImage';
 
 export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
   const currentChatMessage = useSelector(selectCurrentChatMessages);
@@ -29,7 +30,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
 
   const scrollToBottom = useCallback(() => {
     if (scrollMessageRef.current) {
-      scrollMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+      scrollMessageRef.current.scrollIntoView({ behavior: 'smooth'});
     }
   }, [scrollMessageRef]);
 
@@ -140,6 +141,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
           <div className='mb-2'>
             {!isMessageFetching && !isMessageLoading && currentChatMessage && currentChatMessage?.length > 0 && renderMessage}
             {isMessageFetching && <Spinners />}
+            {<ChatImage color={"green"} isForwarded={false} isGroup={false} isPrevSender={false} isReply={false} isSender={false} message={"Hello"} messageData={"Hello Everty "} newDate={"Today"} timeAgo={"12:34"} />}
           </div>
         </div>
       </div>

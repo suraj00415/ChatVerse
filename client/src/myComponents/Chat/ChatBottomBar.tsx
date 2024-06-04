@@ -11,7 +11,7 @@ import { useReplyMessageMutation, useSendMessageMutation } from '@/features/mess
 import { selectCurrentChatMessages, selectIsReplyOpen, selectIsSelectionOpen, selectReplyMessage, selectSelectedMessage, setCurrentChatMessasges, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage } from '@/features/messages/messageSlice';
 import EmojiPicker from 'emoji-picker-react';
 import { useEffect, useRef, useState } from 'react';
-import { BsEmojiSmile } from 'react-icons/bs';
+import { BsEmojiSmile, BsImages } from 'react-icons/bs';
 import { FaStar } from "react-icons/fa6";
 import { IoMdAdd, IoMdClose } from 'react-icons/io';
 import { IoSend } from "react-icons/io5";
@@ -19,7 +19,16 @@ import { MdDelete } from "react-icons/md";
 import { RiShareForwardFill } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
 import UsersList from './UsersList';
-
+import { BiSolidVideos } from "react-icons/bi";
+import { PiFilesBold } from "react-icons/pi";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 export default function ChatBottomBar({ socket }) {
@@ -116,14 +125,51 @@ export default function ChatBottomBar({ socket }) {
                 <div className='bg-zinc-900 cursor-pointer relative ' ref={emojiPickerRef} >
                   <BsEmojiSmile className='h-9 hover:opacity-75 text-zinc-400 w-auto rounded-full  border-2  hover:bg-zinc-700' onClick={() => setShowEmoji(!showEmoji)} />
                   {showEmoji && <div className='bottom-14 left-7 absolute '>
-                    <EmojiPicker theme='dark' emojiStyle='facebook' onEmojiClick={(e) => {
+                    <EmojiPicker theme='dark' emojiStyle='facebook' className="z-40" onEmojiClick={(e, emoji) => {
+                      console.log(e, emoji)
                       setValue((prev) => prev + e.emoji)
                     }} />
                   </div>}
                 </div>
                 {/* add attachment */}
                 <div className='bg-zinc-900 cursor-pointer '  >
-                  <IoMdAdd className='h-9 hover:opacity-75 text-zinc-300 w-auto rounded-full p-1 border-2  hover:bg-zinc-700' />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger><IoMdAdd className='h-9 hover:opacity-75 text-zinc-300 w-auto rounded-full p-1 border-2  hover:bg-zinc-700' /></DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Media</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <div className="flex gap-4 justify-center items-center h-7">
+                          <div>
+                            <BsImages className="h-5 w-auto" />
+                          </div>
+                          <div className="font-bold">
+                            Pictures
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <div className="flex gap-4 justify-center items-center h-7">
+                          <div>
+                            <BiSolidVideos className="h-5 w-auto" />
+                          </div>
+                          <div className="font-bold">
+                            Videos
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <div className="flex gap-4 justify-center items-center h-7">
+                          <div>
+                            <PiFilesBold className="h-5 w-auto" />
+                          </div>
+                          <div className="font-bold">
+                            Files
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
               <div className='max-w-[70%]  w-full '>
