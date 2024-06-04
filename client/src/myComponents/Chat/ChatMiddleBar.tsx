@@ -141,7 +141,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
           <div className='mb-2'>
             {!isMessageFetching && !isMessageLoading && currentChatMessage && currentChatMessage?.length > 0 && renderMessage}
             {isMessageFetching && <Spinners />}
-            {<ChatImage color={"green"} isForwarded={false} isGroup={false} isPrevSender={false} isReply={false} isSender={false} message={"Hello"} messageData={"Hello Everty "} newDate={"Today"} timeAgo={"12:34"} />}
+            {<ChatImage color={"green"} isForwarded={false} isGroup={false} isPrevSender={false} isReply={false} isSender={false} message={"Hello"} messageData={"Hello Everty "} newDate={"Today"} timeAgo={"2024-04-26T16:11:13.128Z"} />}
           </div>
         </div>
       </div>
