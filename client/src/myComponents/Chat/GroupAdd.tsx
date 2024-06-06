@@ -79,16 +79,11 @@ export default function GroupAdd() {
         const participants = members?.map((user) => user?._id)
         const dataToSend = { ...data, participants }
         try {
-            if (isAddGroup) {
-                const res = await createGroup(dataToSend).unwrap()
-                toast({ title: "Group Created Successfully" })
-                console.log("response", res)
-                dispatch(setCurrentChat(res?.data))
-                navigate("/")
-            }
-            else {
-                toast({ title: "Something went Wrong in submitHandler", variant: "destructive" })
-            }
+            const res = await createGroup(dataToSend).unwrap()
+            toast({ title: "Group Created Successfully" })
+            console.log("response", res?.data)
+            dispatch(setCurrentChat(res?.data))
+            navigate("/")
         } catch (error) {
             toast({ title: error?.data?.message || "Something went wrong", variant: "destructive" })
             console.log(error)

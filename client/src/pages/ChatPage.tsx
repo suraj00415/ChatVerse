@@ -16,8 +16,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import socketio from "socket.io-client"
 
 
-export default function ChatPage() {
 
+export default function ChatPage() {
 
     const dispatch = useDispatch()
     const { data, refetch: refetchChats } = useGetAllChatQuery(null)
@@ -34,11 +34,13 @@ export default function ChatPage() {
         refetch()
         dispatch(setCurrentChatMessasges(message?.message))
     }, [message, chatId])
+
     useEffect(() => {
         refetchChats()
         dispatch(setAllChat(data?.data))
         dispatch(setSearchChats(data?.data))
     }, [data])
+
 
     const [socket, setSocket] = useState<ReturnType<typeof socketio> | null>(null)
     const currentChat = useSelector(selectCurrentChat)
@@ -57,7 +59,7 @@ export default function ChatPage() {
             else if (c?.isGroup && c?.Group?.name?.toLowerCase()?.includes(searchInputValue.toLowerCase())) return c
         })
         dispatch(setSearchChats(searchChat))
-    }, [searchInputValue])
+    }, [searchInputValue, chat])
     useEffect(() => {
         if (newMessage) {
             dispatch(setCurrentChatMessasges([...currentMessage, newMessage]))
@@ -138,6 +140,24 @@ export default function ChatPage() {
         }
     }, [socket, chatId])
     const unreadMessage = useSelector(selectUnreadMessage)
+
+    useEffect(() => {
+        const currChatData = chat?.filter((d) => {
+            if (d?._id === currentChat?._id) return d
+        })
+        console.log("currChatData", currChatData)
+        if (currChatData && currChatData?.length) {
+            dispatch(setCurrentChat(currChatData[0]))
+        }
+    }, [data, chat])
+    useEffect(() => {
+        const otherParticipant = currentChat?.participants?.filter((participant) => {
+            if (participant?._id !== user?._id) return participant
+        })
+        if (currentChat) {
+            dispatch(setOtherParicipantChat(otherParticipant))
+        }
+    }, [currentChat])
     return (
         <div className="flex  ">
             <div className="max-w-[420px] w-full flex flex-col h-screen">
@@ -146,7 +166,6 @@ export default function ChatPage() {
                 <ScrollArea className="h-screen">
                     {
                         searchChats && searchChats?.map((d, i) => {
-
                             const unread = unreadMessage?.filter((uread) => {
                                 if (uread?.chat === d?._id) return uread
                             })
@@ -161,7 +180,6 @@ export default function ChatPage() {
                                     dispatch(setSelectedMessage([]))
                                     dispatch(setReplyOpen(false))
                                     dispatch(setCurrentChat(d))
-                                    dispatch(setOtherParicipantChat(otherParticipant))
                                 }} key={i}>
                                     < ChatHeading chatId={d?._id} imageSrc={d?.isGroup ? d?.Group?.avatar : otherParticipant[0]?.avatar} name={d?.isGroup ? d?.Group?.name : otherParticipant[0]?.name} message={d?.lastmessage?.content} message_person_name={message_person_name} msgTime={formatTime(d?.lastmessage?.createdAt || "")} messageCount={unread?.length} />
                                 </div>)

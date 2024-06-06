@@ -8,7 +8,7 @@ export default function Navbar() {
             <div className='bg-zinc-900 p-2 flex justify-around items-center '>
                 <div className="hover:bg-zinc-600 rounded-full p-2 cursor-pointer" onClick={() => navigate("/")}><IoArrowBack className="h-6 w-auto" /></div>
                 <div>
-                    <div className="cursor-pointer font-extrabold text-2xl bg-gradient-to-r from-lime-400 to-emerald-400 bg-clip-text text-transparent">ChatVerse</div>
+                    <img src="./assets/Blender/logoChat2.png" className="h-9 w-auto  " alt="" />
                 </div>
                 <div></div>
             </div>

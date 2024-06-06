@@ -72,7 +72,7 @@ export const renameGroupChat = asyncHandler(async (req, res) => {
 });
 
 export const addAdmins = asyncHandler(async (req, res) => {
-    const { admins, chatId } = req.body;
+    let { admins, chatId } = req.body;
     if (!admins || !chatId)
         throw new ApiError(400, "Admins or ChatId is Required");
 
@@ -92,10 +92,11 @@ export const addAdmins = asyncHandler(async (req, res) => {
         if (chatAdmin.includes(new mongoose.Types.ObjectId(id)))
             throw new ApiError(400, "Admin Already Existed in the group");
     });
+    admins = admins?.map((id) => new mongoose.Types.ObjectId(id));
 
     const newAdminList = new Set([...chatAdmin, ...admins]);
-    existedChat.admins = newAdminList;
     console.log(newAdminList);
+    existedChat.admins = Array.from(newAdminList);
     existedChat.save({ validateBeforeSave: false });
     const chat = await Chat.aggregate([
         {

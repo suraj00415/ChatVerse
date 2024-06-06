@@ -54,10 +54,6 @@ export const chatSlice = apiSlice.injectEndpoints({
         }),
         removeParticipants: builder.mutation({
             query: (formData) => {
-                const formDataBody = new FormData();
-                Object.keys(formData).forEach(key => {
-                    formDataBody.append(key, formData[key]);
-                });
                 return {
                     url: '/chats/participants/remove',
                     method: "DELETE",

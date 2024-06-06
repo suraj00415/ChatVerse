@@ -76,7 +76,7 @@ export default function ChatTopBar({ typing, typingData }) {
         <div className='flex justify-between items-center w-full'>
           <div className='flex items-center w-full'>
             <div className='m-2'>
-              <div >
+              <div className="h-[50px] flex justify-center items-center">
                 <img className='min-w-[40px] w-[50px] h-auto rounded-full' src={currentChat?.isGroup ? currentChat?.Group?.avatar : otherParticipant?.avatar} alt="" />
               </div>
             </div>
@@ -96,15 +96,9 @@ export default function ChatTopBar({ typing, typingData }) {
                   </div>
                 </div>
               </SheetTrigger>
-              <SheetContent className="overflow-y-scroll">
-                <SheetHeader className="w-full">
-                  <SheetTitle>{currentChat?.isGroup ? "Group Info" : "Personal Info"}</SheetTitle>
-                  <SheetDescription className="">
-                    {/* This action cannot be undone. This will permanently delete your account
-                  and remove your data from our servers. */}
-                    <MoreInfo />
-                  </SheetDescription>
-                </SheetHeader>
+              <SheetContent className="overflow-y-scroll w-[380px]">
+                <SheetTitle>{currentChat?.isGroup ? "Group Info" : "Personal Info"}</SheetTitle>
+                <MoreInfo />
               </SheetContent>
             </Sheet>
 

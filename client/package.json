@@ -22,6 +22,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "emoji-picker-react": "^4.9.2",
+    "emoji-regex": "^10.3.0",
     "javascript-time-ago": "^2.5.9",
     "lucide-react": "^0.367.0",
     "moment": "^2.30.1",

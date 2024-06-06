@@ -9,7 +9,7 @@ import {
 import { selectCurrentChat } from '@/features/chat/chatSlice';
 import { useReplyMessageMutation, useSendMessageMutation } from '@/features/messages/messageApi';
 import { selectCurrentChatMessages, selectIsReplyOpen, selectIsSelectionOpen, selectReplyMessage, selectSelectedMessage, setCurrentChatMessasges, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage } from '@/features/messages/messageSlice';
-import EmojiPicker from 'emoji-picker-react';
+import EmojiPicker, { EmojiStyle, Theme } from 'emoji-picker-react';
 import { useEffect, useRef, useState } from 'react';
 import { BsEmojiSmile, BsImages } from 'react-icons/bs';
 import { FaStar } from "react-icons/fa6";
@@ -29,10 +29,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MessageWithEmojis } from "./MessageWithEmoji";
 
 
 export default function ChatBottomBar({ socket }) {
-  const [value, setValue] = useState("")
+  const [value, setValue] = useState<string>("")
+
   const [showEmoji, setShowEmoji] = useState(false)
   const emojiPickerRef = useRef(null);
   const dispatch = useDispatch()
@@ -103,12 +105,12 @@ export default function ChatBottomBar({ socket }) {
       {currentChat && !isSelectionOpen &&
         <div className='h-full bg-zinc-900 w-full border-t-2 '>
           {isReplyOpen && <div className='flex items-center '>
-            <div className='w-full bg-zinc-900 h-24  flex justify-center items-center'>
+            <div className='w-full bg-zinc-900 h-32  flex justify-center items-center'>
               <div className='w-[95%] bg-zinc-800  h-[90%] rounded-lg flex overflow-hidden gap-3 mt-1 '>
                 <div><div style={{ backgroundColor: replyMessage?.sender?.color }} className=' w-1 h-full '></div></div>
                 <div className=''>
                   <div style={{ color: replyMessage?.sender?.color }} className='font-bold'>{replyMessage?.sender?.username}</div>
-                  <div className='text-gray-400'>{replyMessage?.content?.length > 200 ? replyMessage?.content?.substring(0, 200) + "....." : replyMessage?.content}</div>
+                  <div className='text-gray-400'><MessageWithEmojis message={replyMessage?.content} isReplyContent={true}/></div>
                 </div>
               </div>
             </div>
@@ -125,10 +127,15 @@ export default function ChatBottomBar({ socket }) {
                 <div className='bg-zinc-900 cursor-pointer relative ' ref={emojiPickerRef} >
                   <BsEmojiSmile className='h-9 hover:opacity-75 text-zinc-400 w-auto rounded-full  border-2  hover:bg-zinc-700' onClick={() => setShowEmoji(!showEmoji)} />
                   {showEmoji && <div className='bottom-14 left-7 absolute '>
-                    <EmojiPicker theme='dark' emojiStyle='facebook' className="z-40" onEmojiClick={(e, emoji) => {
-                      console.log(e, emoji)
-                      setValue((prev) => prev + e.emoji)
-                    }} />
+                    <EmojiPicker
+                      // skinTonesDisabled
+                      theme={Theme.DARK}
+                      emojiStyle={EmojiStyle.FACEBOOK}
+                      className="z-40"
+                      onEmojiClick={(e, emoji) => {
+                        console.log(e, emoji)
+                        setValue((prev) => prev + e.emoji)
+                      }} />
                   </div>}
                 </div>
                 {/* add attachment */}
@@ -143,7 +150,7 @@ export default function ChatBottomBar({ socket }) {
                           <div>
                             <BsImages className="h-5 w-auto" />
                           </div>
-                          <div className="font-bold">
+                          <div className="">
                             Pictures
                           </div>
                         </div>
@@ -153,7 +160,7 @@ export default function ChatBottomBar({ socket }) {
                           <div>
                             <BiSolidVideos className="h-5 w-auto" />
                           </div>
-                          <div className="font-bold">
+                          <div className="">
                             Videos
                           </div>
                         </div>
@@ -163,7 +170,7 @@ export default function ChatBottomBar({ socket }) {
                           <div>
                             <PiFilesBold className="h-5 w-auto" />
                           </div>
-                          <div className="font-bold">
+                          <div className="">
                             Files
                           </div>
                         </div>
@@ -174,15 +181,19 @@ export default function ChatBottomBar({ socket }) {
               </div>
               <div className='max-w-[70%]  w-full '>
                 <div className='w-full'>
-                  <input onKeyDown={handleKeyDown} value={value} onChange={(e) => {
-                    setValue(e.target.value)
-                    socket?.emit("startTyping", currentChat?._id)
-                    setTimeout(() => {
-                      socket?.emit("stopTyping", currentChat?._id)
-                    }, 3000)
-                  }
-                  }
-                    type="text" className=' outline-zinc-600 rounded-xl p-2 py-3 pl-5 bg-zinc-800 w-full' placeholder='Enter the text message ' />
+                  <input
+                    onKeyDown={handleKeyDown}
+                    value={value}
+                    onChange={(e) => {
+                      setValue(e.target.value)
+                      socket?.emit("startTyping", currentChat?._id)
+                      setTimeout(() => {
+                        socket?.emit("stopTyping", currentChat?._id)
+                      }, 3000)
+                    }
+                    }
+                    type="text" className=' outline-zinc-600 rounded-xl p-2 py-3 pl-5 bg-zinc-800 w-full'
+                    placeholder='Enter the text message ' />
                 </div>
               </div>
               <div className='bg-zinc-900 cursor-pointer' onClick={sendMessageHandler}>

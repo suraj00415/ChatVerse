@@ -219,7 +219,7 @@ export const createOneToOneChat = asyncHandler(async (req, res) => {
 export const createGroup = asyncHandler(async (req, res) => {
     const { name, participants, description } = req.body;
     const groupAvatar = req?.file;
-    const participantArray = participants?.split(',');
+    const participantArray = participants?.split(",");
     console.log(participantArray);
     if (!name || !participantArray.length || !description)
         throw new ApiError(
@@ -380,7 +380,10 @@ export const removeParticipantFromGroupChat = asyncHandler(async (req, res) => {
             throw new ApiError(400, `Invalid Participant Id :${id}`);
     });
     if (members.includes(req.user?._id.toString()))
-        throw new ApiError(400, "Admin Cannot Be Participants");
+        throw new ApiError(
+            400,
+            "You Cannot Remove Yourself. You Need To Leave the Group !!!"
+        );
 
     const groupChat = await Chat.findById(chatId);
     const admins = groupChat.admins;
@@ -395,6 +398,12 @@ export const removeParticipantFromGroupChat = asyncHandler(async (req, res) => {
         if (members.includes(id.toString())) return null;
         else return id;
     });
+    console.log("New:", newParticipants.length);
+    if (newParticipants.length < 3)
+        throw new ApiError(
+            400,
+            "You Need To Delete This Group (Minimum 3 Members are Required !!!)"
+        );
 
     groupChat.participants = newParticipants;
     groupChat.save({ validateBeforeSave: false });
@@ -559,10 +568,10 @@ export const getAllChats = asyncHandler(async (req, res) => {
         },
         ...grouChatAggregation(),
         {
-            $sort:{
-                lastmessage:-1
-            }
-        }
+            $sort: {
+                lastmessage: -1,
+            },
+        },
     ]);
 
     if (!chat.length) throw new ApiError(400, "No Data To Show");

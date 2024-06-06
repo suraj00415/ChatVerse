@@ -1,7 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { selectCurrentUser } from '@/features/auth/authSlice';
 import { selectAllChats } from '@/features/chat/chatSlice';
-import { selectSelectedMessage } from '@/features/messages/messageSlice';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 

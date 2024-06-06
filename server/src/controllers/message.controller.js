@@ -79,6 +79,7 @@ export const messageAggregation = () => {
 export const sendMessage = asyncHandler(async (req, res) => {
     const { chatId, content } = req.body;
     console.log(req.files?.attachments);
+    console.log(req?.files);
     if (!content && !req.files?.attachments?.length)
         throw new ApiError(400, "Content or attachments are required");
     if (!chatId) throw new ApiError(400, "ChatId is required");
@@ -335,8 +336,8 @@ export const forwardMessage = asyncHandler(async (req, res) => {
         chat.participants.forEach((parrticipantId) => {
             if (parrticipantId.toString() === req.user?._id?.toString()) return;
             aggMessage.forEach((mess, i) => {
-                console.log("Mess Chat",mess?.chat)
-                console.log("chats?._id.toString()",chats?._id?.toString())
+                console.log("Mess Chat", mess?.chat);
+                console.log("chats?._id.toString()", chats?._id?.toString());
                 if (mess?.chat.toString() === chat?._id?.toString()) {
                     emitSocket(
                         req,

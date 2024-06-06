@@ -30,7 +30,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
 
   const scrollToBottom = useCallback(() => {
     if (scrollMessageRef.current) {
-      scrollMessageRef.current.scrollIntoView({ behavior: 'smooth'});
+      scrollMessageRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [scrollMessageRef]);
 
@@ -85,7 +85,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
           <div
             className={`${isSelectionOpen ? "cursor-pointer pr-2" : ""} flex items-center mt-1 rounded-lg`}
             style={{ backgroundColor: isSelectionOpen && selectedMessages.includes(data?._id) ? "rgba(106, 109, 122, 0.42)" : "" }}
-            onClick={(e) => {isSelectionOpen && toggleCheckbox(e, data?._id)}}
+            onClick={(e) => { isSelectionOpen && toggleCheckbox(e, data?._id) }}
             onMouseEnter={(e) => { if (isSelectionOpen) { e.currentTarget.classList.add('backGroundOp', 'opacity-80'); } }}
             onMouseLeave={(e) => { if (isSelectionOpen) { e.currentTarget.classList.remove('backGroundOp', 'opacity-80'); } }}
             ref={i === formattedMessages?.length - 1 ? scrollMessageRef : null}
@@ -97,8 +97,8 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
             )}
             <div className={`${isPrevSender && !newDate ? "" : "mt-3"} w-full`}>
               <div className='flex flex-col'>
-                <div className={`${isSender ? 'self-end' : 'self-start'}`}>
-                  <ChatSimple
+                <div className={`${isSender ? 'self-end' : 'self-start'}`} key={data?._id + 2}>
+                  {data?.attachments && data?.attachments?.length==0 &&  <ChatSimple
                     isForwarded={data?.isForwarded}
                     message={data?.content}
                     isSender={isSender}
@@ -113,7 +113,24 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
                     replyToName={data?.replyTo?.sender?.username || ""}
                     replyToColor={data?.replyTo?.sender?.color || ""}
                     replyToContent={data?.replyTo?.content || ""}
-                  />
+                  />}
+                  {data?.attachments && data?.attachments?.length>0  && <ChatImage
+                    isForwarded={data?.isForwarded}
+                    message={data?.content}
+                    isSender={isSender}
+                    isGroup={currentChat?.isGroup}
+                    senderName={data?.sender?.username}
+                    timeAgo={data?.createdAt}
+                    newDate={newDate}
+                    isPrevSender={isPrevSender && !newDate}
+                    color={data?.sender?.color}
+                    messageData={data}
+                    isReply={data?.isReply || false}
+                    replyToName={data?.replyTo?.sender?.username || ""}
+                    replyToColor={data?.replyTo?.sender?.color || ""}
+                    replyToContent={data?.replyTo?.content || ""}
+                    images={data?.attachments}
+                  />}
                 </div>
               </div>
             </div>
@@ -141,14 +158,14 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
           <div className='mb-2'>
             {!isMessageFetching && !isMessageLoading && currentChatMessage && currentChatMessage?.length > 0 && renderMessage}
             {isMessageFetching && <Spinners />}
-            {<ChatImage color={"green"} isForwarded={false} isGroup={false} isPrevSender={false} isReply={false} isSender={false} message={"Hello"} messageData={"Hello Everty "} newDate={"Today"} timeAgo={"2024-04-26T16:11:13.128Z"} />}
           </div>
         </div>
       </div>
       {!currentChat && !currentChat?.length && (
         <div className='flex flex-col justify-center items-center gap-10'>
-          <div className='flex justify-center items-center mt-20 text-4xl font-bold bg-gradient-to-r from-lime-400 to-emerald-400 bg-clip-text text-transparent'>
-            Welcome To ChatVerse
+          <div className='flex justify-center items-center mt-16'>
+            <img src="/assets/Blender/ChatVerse2.png" className='h-28 w-auto' alt="" />
+            <img src="./assets/Blender/logoChat2.png" className="h-20 w-auto  " alt="" />
           </div>
           <img src={chatFiller2} alt="" className='h-96 w-auto' />
         </div>
