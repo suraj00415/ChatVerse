@@ -1,7 +1,6 @@
 import React from 'react';
 import { Emoji, EmojiStyle } from "emoji-picker-react";
 import emojiRegex from 'emoji-regex';
-import { string } from 'yup';
 
 function emojiToUnified(emoji) {
     return Array.from(emoji)

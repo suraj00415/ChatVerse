@@ -15,6 +15,12 @@ const chatSchema = new Schema(
                 ref: "User",
             },
         ],
+        removedParticipants: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: "User",
+            },
+        ],
         admins: [
             {
                 type: mongoose.Schema.ObjectId,

@@ -1,5 +1,20 @@
 import mongoose, { Schema } from "mongoose";
 
+const reactionSchema = new Schema(
+    {
+        participantId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        emojiCode: {
+            type: String,
+            required: true,
+        },
+    },
+    { _id: false }
+);
+
 const messageSchema = new Schema(
     {
         sender: {
@@ -36,6 +51,25 @@ const messageSchema = new Schema(
         forwardCount: {
             type: Number,
             default: 0,
+        },
+        reactions: [reactionSchema],
+        isSenderRemoved: {
+            type: Boolean,
+            default: false,
+        },
+        isDeletedBySenderToAll: {
+            type: Boolean,
+            default: false,
+        },
+        deletedAlert: {
+            type: String,
+        },
+        isMainAlert: {
+            type: Boolean,
+            default: false,
+        },
+        alertContent: {
+            type: String,
         },
     },
     { timestamps: true }

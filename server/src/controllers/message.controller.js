@@ -100,7 +100,6 @@ export const sendMessage = asyncHandler(async (req, res) => {
             attachments.push(uploaded.url);
             attachmentsFileName.push(attach.filename);
         });
-
         await Promise.all(uploadPromises);
     }
 
