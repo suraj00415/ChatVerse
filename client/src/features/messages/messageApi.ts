@@ -41,10 +41,6 @@ export const messageSlice = apiSlice.injectEndpoints({
         }),
         forwardMessage: builder.mutation({
             query: (formData) => {
-                // const formDataBody = new FormData();
-                // Object.keys(formData).forEach(key => {
-                //     formDataBody.append(key, formData[key]);
-                // });
                 return {
                     url: '/messages/forward-message',
                     method: 'POST',
@@ -54,7 +50,29 @@ export const messageSlice = apiSlice.injectEndpoints({
             },
             invalidatesTags: ["Message", "Chat"]
         }),
+        deleteForMe: builder.mutation({
+            query: (formData) => {
+                return {
+                    url: '/messages/delete-for-me',
+                    method: 'DELETE',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
+        deleteForEveryone: builder.mutation({
+            query: (formData) => {
+                return {
+                    url: '/messages/delete-for-everyone',
+                    method: 'DELETE',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
     })
 })
 
-export const { useGetMessageQuery, useSendMessageMutation, useReplyMessageMutation, useForwardMessageMutation } = messageSlice
+export const { useGetMessageQuery, useDeleteForEveryoneMutation, useDeleteForMeMutation, useSendMessageMutation, useReplyMessageMutation, useForwardMessageMutation } = messageSlice

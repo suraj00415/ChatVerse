@@ -18,7 +18,7 @@ export default function ChatHeading({ imageSrc, name, message, message_person_na
     const dispatch = useDispatch()
     const filterUnreadMessgeHandler = (chatId) => {
         const filteredUnreadMessage = unreadMessage?.filter((uread) => {
-            if (uread?.chat !== chatId) return uread
+            if (uread?.message?.chat !== chatId) return uread
         })
         dispatch(setFilterUnreadMessge(filteredUnreadMessage))
     }
@@ -28,7 +28,7 @@ export default function ChatHeading({ imageSrc, name, message, message_person_na
         (<div className='max-w-[420px] w-full cursor-pointer hover:bg-zinc-800 pr-2' onClick={() => filterUnreadMessgeHandler(chatId)}>
             <div className='p-1  flex gap-4 rounded-lg '>
                 <div className='m-2'>
-                    <div  className="h-[55px] justify-center items-center flex">
+                    <div className="h-[55px] justify-center items-center flex">
                         <img className='w-[75px] h-auto rounded-full' src={imageSrc} alt="" />
                     </div>
                 </div>
@@ -39,10 +39,10 @@ export default function ChatHeading({ imageSrc, name, message, message_person_na
                         <div className='font-bold text-lg'>{name}</div>
                         {/* msg */}
                         <div className='flex gap-1 '>
-                            {message_person_name && <div className="">{message_person_name?.length > 12 ?message_person_name?.substring(0,12) +"..": message_person_name}</div>}
+                            {message_person_name && <div className="">{message_person_name?.length > 12 ? message_person_name?.substring(0, 12) + ".." : message_person_name}</div>}
                             {message_person_name && <div>:</div>}
                             {/* {message_person_name && message && <div className="">{message?.length > 20 ? message?.substring(0, 20) + "..." : message}</div>} */}
-                            {message_person_name && message && <div className=""><MessageWithEmojis message={message} isHeading={true} isSmall={true}/></div>}
+                            {message_person_name && message && <div className=""><MessageWithEmojis message={message} isHeading={true} isSmall={true} /></div>}
                             {!message_person_name && !message && <div>No New Message To Display</div>}
                         </div>
                     </div>

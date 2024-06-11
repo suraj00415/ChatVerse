@@ -10,6 +10,9 @@ import { store } from './features/store.ts'
 import './index.css'
 import { persistStore } from 'redux-persist'
 import { Toaster } from "./components/ui/toaster.tsx"
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
 
 
 let persistor = persistStore(store)
@@ -20,9 +23,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <Provider store={store}>
           <PersistGate persistor={persistor}>
-            <Routes>
-              <Route path='/*' element={<App />} />
-            </Routes>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Routes>
+                <Route path='/*' element={<App />} />
+              </Routes>
+            </LocalizationProvider>
           </PersistGate>
         </Provider>
       </BrowserRouter>
