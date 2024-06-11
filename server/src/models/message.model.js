@@ -15,6 +15,21 @@ const reactionSchema = new Schema(
     { _id: false }
 );
 
+const statusSchema = new Schema(
+    {
+        participantId: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        time: {
+            type: Date,
+        },
+    },
+    { _id: false }
+);
+
+
 const messageSchema = new Schema(
     {
         sender: {
@@ -71,6 +86,9 @@ const messageSchema = new Schema(
         alertContent: {
             type: String,
         },
+        unread: [statusSchema],
+        read: [statusSchema],
+        sent: [statusSchema],
     },
     { timestamps: true }
 );

@@ -1,6 +1,6 @@
+import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import jwt from "jsonwebtoken";
 
 export const initializeSocket = async (io) => {
     return io.on("connection", async (socket) => {
@@ -68,7 +68,7 @@ export const initializeSocket = async (io) => {
 };
 
 export const emitSocket = (req, chatId, eventName, payload) => {
-    console.log("socket-chat-new emited");
+    console.log("socket-chat-new emited :", eventName);
     req.app.get("io").in(chatId).emit(eventName, payload);
-    console.log("socket-chat-new completed");
+    console.log("socket-chat-new completed :", eventName);
 };

@@ -6,6 +6,7 @@ import morgan from "morgan";
 import { Server } from "socket.io";
 import { errorHandler } from "./middlewares/error.middlewar.js";
 import { initializeSocket } from "./sockets/socket.js";
+import { agenda } from "./agenda/agenda.js";
 
 const app = express();
 export const httpServer = createServer(app);
@@ -17,9 +18,8 @@ const io = new Server(httpServer, {
         credentials: true,
     },
 });
-
 app.set("io", io);
-
+agenda.io = io;
 const corsOptions = {
     origin: process.env.CORS_ORIGIN,
     credentials: true,
