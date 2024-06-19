@@ -119,7 +119,12 @@ export const sendMessage = asyncHandler(async (req, res) => {
         });
         await Promise.all(uploadPromises);
     }
-    const unreadEntries = existedChat.participants.map((participantId) => ({
+    const unreadPart = existedChat.participants.filter((participantId) => {
+        if (participantId.toString() !== req?.user?._id.toString()) {
+            return participantId;
+        }
+    });
+    const unreadEntries = unreadPart.map((participantId) => ({
         participantId,
     }));
 
@@ -258,7 +263,14 @@ export const sendReplyMessage = asyncHandler(async (req, res) => {
         });
         await Promise.all(uploadPromises);
     }
-
+    const unreadPart = chatExisted.participants.filter((participantId) => {
+        if (participantId.toString() !== req?.user?._id.toString()) {
+            return participantId;
+        }
+    });
+    const unreadEntries = unreadPart.map((participantId) => ({
+        participantId,
+    }));
     const newMessage = await Message.create({
         content,
         attachments,
@@ -266,6 +278,7 @@ export const sendReplyMessage = asyncHandler(async (req, res) => {
         replyTo: messageId,
         sender: req?.user?._id,
         chat: chatId,
+        unread:unreadEntries
     });
 
     const chat = await Chat.findOneAndUpdate(
@@ -427,8 +440,6 @@ export const forwardMessage = asyncHandler(async (req, res) => {
         chat.participants.forEach((parrticipantId) => {
             if (parrticipantId.toString() === req.user?._id?.toString()) return;
             aggMessage.forEach((mess, i) => {
-                // console.log("Mess Chat", mess?.message?.chat);
-                // console.log("chats?._id.toString()", chat?._id?.toString());
                 if (mess?.chatId?.toString() === chat?._id?.toString()) {
                     emitSocket(
                         req,
@@ -571,12 +582,9 @@ export const scheduleMessage = asyncHandler(async (req, res) => {
 });
 
 export const setReadMessage = asyncHandler(async (req, res) => {
-    const { messageIds, chatId } = req.body;
-    if (!messageIds?.length || !chatId)
+    const { messageIds } = req.body;
+    if (!messageIds?.length)
         throw new ApiError(400, "MessageIds and ChatId Are Required");
-
-    const existedChat = await Chat.findById(chatId);
-    if (!existedChat) throw new ApiError(404, "Chat Does Not Exists!!");
     try {
         await Message.find({
             _id: {
@@ -586,24 +594,28 @@ export const setReadMessage = asyncHandler(async (req, res) => {
     } catch (error) {
         throw new ApiError(400, "Invalid MessageIds");
     }
-    const messageUpdated = await Message.updateMany(
-        {
-            _id: {
-                $in: messageIds,
-            },
-        },
-        {
-            $set: {
-                read: {
-                    participantId: new mongoose.Types.ObjectId(req?.user?._id),
-                },
-            },
-            $pull: {
-                unread: {
-                    participantId: new mongoose.Types.ObjectId(req?.user?._id),
-                },
-            },
-        }
+    const userId = new mongoose.Types.ObjectId(req?.user?._id);
+    const currentTime = Date.now();
+
+    const messageUpdated = await Promise.all(
+        messageIds?.map(async (messageId) => {
+            const message = await Message.findById(messageId);
+            if (message) {
+                const alreadySent = message.read.some((s) =>
+                    s.participantId.equals(userId)
+                );
+                if (!alreadySent) {
+                    message.read.push({
+                        participantId: userId,
+                        time: currentTime,
+                    });
+                    message.unread = message.unread.filter(
+                        (u) => !u.participantId.equals(userId)
+                    );
+                    return message.save();
+                }
+            }
+        })
     );
     if (!messageUpdated)
         throw new ApiError(
@@ -624,12 +636,16 @@ export const setReadMessage = asyncHandler(async (req, res) => {
         },
         ...messageAggregation2(),
     ]);
-    console.log("Message:", message);
     if (!message.length)
         throw new ApiError(500, "Something Wrong While Fetching Read Messages");
 
-    existedChat?.participants.forEach((participant) => {
-        emitSocket(req, participant.toString(), "read", message);
+    message.forEach((msg) => {
+        emitSocket(
+            req,
+            msg.message?.sender?._id.toString(),
+            "statusMessage",
+            msg
+        );
     });
 
     return res
@@ -640,12 +656,9 @@ export const setReadMessage = asyncHandler(async (req, res) => {
 });
 
 export const setSentMessage = asyncHandler(async (req, res) => {
-    const { messageIds, chatId } = req.body;
-    if (!messageIds?.length || !chatId)
+    const { messageIds } = req.body;
+    if (!messageIds?.length)
         throw new ApiError(400, "MessageIds and ChatId Are Required");
-
-    const existedChat = await Chat.findById(chatId);
-    if (!existedChat) throw new ApiError(404, "Chat Does Not Exists!!");
     try {
         await Message.find({
             _id: {
@@ -655,19 +668,25 @@ export const setSentMessage = asyncHandler(async (req, res) => {
     } catch (error) {
         throw new ApiError(400, "Invalid MessageIds");
     }
-    const messageUpdated = await Message.updateMany(
-        {
-            _id: {
-                $in: messageIds,
-            },
-        },
-        {
-            $set: {
-                sent: {
-                    participantId: new mongoose.Types.ObjectId(req?.user?._id),
-                },
-            },
-        }
+    const userId = new mongoose.Types.ObjectId(req?.user?._id);
+    const currentTime = Date.now();
+
+    const messageUpdated = await Promise.all(
+        messageIds?.map(async (messageId) => {
+            const message = await Message.findById(messageId);
+            if (message) {
+                const alreadySent = message.sent.some((s) =>
+                    s.participantId.equals(userId)
+                );
+                if (!alreadySent) {
+                    message.sent.push({
+                        participantId: userId,
+                        time: currentTime,
+                    });
+                    return message.save();
+                }
+            }
+        })
     );
     if (!messageUpdated)
         throw new ApiError(
@@ -688,13 +707,18 @@ export const setSentMessage = asyncHandler(async (req, res) => {
         },
         ...messageAggregation2(),
     ]);
-    console.log("Message:", message);
     if (!message.length)
         throw new ApiError(500, "Something Wrong While Fetching Read Messages");
 
-    existedChat?.participants.forEach((participant) => {
-        emitSocket(req, participant.toString(), "sent", message);
+    message.forEach((msg) => {
+        emitSocket(
+            req,
+            msg.message?.sender?._id.toString(),
+            "statusMessage",
+            msg
+        );
     });
+
     return res
         .status(200)
         .json(
@@ -712,7 +736,7 @@ export const getUnreadMessages = asyncHandler(async (req, res) => {
         ...messageAggregation2(),
         {
             $match: {
-                "message.read.participantId": req?.user?._id,
+                "message.unread.participantId": req?.user?._id,
             },
         },
     ]);

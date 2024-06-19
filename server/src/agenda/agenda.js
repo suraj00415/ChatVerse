@@ -5,6 +5,7 @@ import { messageAggregation2 } from "../controllers/message.controller.js";
 import { Message } from "../models/message.model.js";
 import { UserMessage } from "../models/userMessage.model.js";
 import mongoose, { isValidObjectId } from "mongoose";
+import logger from "../utils/logger.js";
 
 export const agenda = new Agenda({
     db: { address: process.env.MONGODB_URI, collection: "agendaJobs" },
@@ -71,7 +72,7 @@ agenda.define("send scheduled message", async (job) => {
             messages[0]
         );
     });
-    console.log(
+    logger.debug(
         `Message sent to chat ${chatId} for user ${userId}: ${content}`
     );
     // return res

@@ -3,6 +3,7 @@ import app from "./app.js";
 import { httpServer } from "./app.js";
 import { port } from "./utils/constants.js";
 import connectDB from "./utils/connectDb.js";
+import logger from "./utils/logger.js";
 
 dotenv.config({
     path: "../.env",
@@ -11,14 +12,11 @@ dotenv.config({
 connectDB()
     .then(() => {
         httpServer.listen(port, () => {
-            console.log("🙌😀 Server started on port:", port);
+            logger.verbose("🙌😀 Server started on port:" + port);
         });
     })
     .catch((err) => {
-        console.log(
-            "Some errror Occured while connecting to the database:",
-            err
+        logger.error(
+            "Some errror Occured while connecting to the database:" + err
         );
     });
-
-

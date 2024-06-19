@@ -29,7 +29,6 @@ const statusSchema = new Schema(
     { _id: false }
 );
 
-
 const messageSchema = new Schema(
     {
         sender: {
@@ -92,5 +91,10 @@ const messageSchema = new Schema(
     },
     { timestamps: true }
 );
+messageSchema.pre("save", function (next) {
+    this.read.sort((a, b) => b.time - a.time);
+    this.sent.sort((a, b) => b.time - a.time);
+    next();
+});
 
 export const Message = mongoose.model("Message", messageSchema);

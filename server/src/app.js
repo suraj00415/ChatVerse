@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { errorHandler } from "./middlewares/error.middlewar.js";
 import { initializeSocket } from "./sockets/socket.js";
 import { agenda } from "./agenda/agenda.js";
+import logger from "./utils/logger.js";
 
 const app = express();
 export const httpServer = createServer(app);
@@ -26,7 +27,27 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(morgan("combined"));
+
+const morganFormat =
+    ":method :url :status :response-time ms :user-agent [:date[clf]]";
+app.use(
+    morgan(morganFormat, {
+        stream: {
+            write: (message) => {
+                const msg = message.split(" ");
+                const logObject = {
+                    method: msg[0],
+                    url: msg[1],
+                    status: msg[2],
+                    responseTime: msg[3],
+                    userAgent: msg[5],
+                    date: msg[6],
+                };
+                logger.info(JSON.stringify(logObject));
+            },
+        },
+    })
+);
 app.use(express.json({ limit: "30kb" }));
 app.use(express.urlencoded({ limit: "30kb", extended: true }));
 app.use(cookieParser());
