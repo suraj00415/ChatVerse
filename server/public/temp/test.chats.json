@@ -1,0 +1,511 @@
+[{
+  "_id": {
+    "$oid": "66054ef7a28a4ca0240fa658"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "660428ca9bda13e9b712477d"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-03-28T11:05:27.743Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-22T12:47:07.542Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "66265c4b251d1d2345ff79dc"
+  }
+},
+{
+  "_id": {
+    "$oid": "6605539d6144be9614b2ff0a"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "660553526144be9614b2ff00"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-03-28T11:25:17.667Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T03:43:11.683Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "6629d14f97cbf91d0f20c435"
+  }
+},
+{
+  "_id": {
+    "$oid": "660553b76144be9614b2ff0f"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-03-28T11:25:43.832Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-22T12:39:56.289Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "66265a9c251d1d2345ff7894"
+  }
+},
+{
+  "_id": {
+    "$oid": "660553d56144be9614b2ff18"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    },
+    {
+      "$oid": "660428ca9bda13e9b712477d"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-03-28T11:26:13.237Z"
+  },
+  "updatedAt": {
+    "$date": "2024-03-28T11:26:13.237Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6605699dcf2647ea7fdfd9b4"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "6605532e6144be9614b2fef0"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-03-28T12:59:09.884Z"
+  },
+  "updatedAt": {
+    "$date": "2024-03-28T12:59:09.884Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "661bededb19c45a93d423252"
+  },
+  "name": "GroupChat",
+  "participants": [
+    {
+      "$oid": "660428ca9bda13e9b712477d"
+    },
+    {
+      "$oid": "6605532e6144be9614b2fef0"
+    },
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    },
+    {
+      "$oid": "660553486144be9614b2fefb"
+    },
+    {
+      "$oid": "660553526144be9614b2ff00"
+    },
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": true,
+  "isCommunity": false,
+  "Group": {
+    "$oid": "661bededb19c45a93d42324f"
+  },
+  "createdAt": {
+    "$date": "2024-04-14T14:53:33.517Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T03:20:33.548Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "6629cc0197cbf91d0f20c361"
+  }
+},
+{
+  "_id": {
+    "$oid": "661d1c8ef671b4a132d32efc"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-15T12:24:46.563Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T04:02:39.155Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "6629d5df97cbf91d0f20c548"
+  }
+},
+{
+  "_id": {
+    "$oid": "661d1e79f671b4a132d32f2a"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    },
+    {
+      "$oid": "660428ca9bda13e9b712477d"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-15T12:32:57.646Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-15T12:32:57.646Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "661d1fe9f671b4a132d3313a"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    },
+    {
+      "$oid": "6605532e6144be9614b2fef0"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-15T12:39:05.850Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-15T12:39:05.850Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "661d2005f671b4a132d33165"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    },
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-15T12:39:33.942Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-15T12:39:33.942Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "661d2020f671b4a132d3316f"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    },
+    {
+      "$oid": "660553526144be9614b2ff00"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-15T12:40:00.466Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-15T12:40:00.466Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "661e4175cb9055cd15ed9879"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "661e4157cb9055cd15ed985f"
+    },
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "661e4157cb9055cd15ed985f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-16T09:14:29.472Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-16T09:17:12.606Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "661e4218cb9055cd15ed98c4"
+  }
+},
+{
+  "_id": {
+    "$oid": "66294e68d61b429f06956d07"
+  },
+  "name": "GroupChat",
+  "participants": [
+    {
+      "$oid": "660428ca9bda13e9b712477d"
+    },
+    {
+      "$oid": "6605532e6144be9614b2fef0"
+    },
+    {
+      "$oid": "660553486144be9614b2fefb"
+    },
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    },
+    {
+      "$oid": "660553526144be9614b2ff00"
+    },
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": true,
+  "isCommunity": false,
+  "Group": {
+    "$oid": "66294e68d61b429f06956d04"
+  },
+  "createdAt": {
+    "$date": "2024-04-24T18:24:40.777Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T04:03:09.005Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "6629d5fc97cbf91d0f20c562"
+  }
+},
+{
+  "_id": {
+    "$oid": "66295e05d61b429f069570c7"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "66265dfd251d1d2345ff7acc"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-24T19:31:17.197Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-24T19:31:17.197Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66295f27d61b429f0695717d"
+  },
+  "name": "oneToOne",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "66265dd7251d1d2345ff7ab0"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    }
+  ],
+  "isGroup": false,
+  "isCommunity": false,
+  "createdAt": {
+    "$date": "2024-04-24T19:36:07.766Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-24T19:36:07.766Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6629d6f897cbf91d0f20c59d"
+  },
+  "name": "GroupChat",
+  "participants": [
+    {
+      "$oid": "660438656bda2b994d5f385f"
+    },
+    {
+      "$oid": "6605533a6144be9614b2fef5"
+    },
+    {
+      "$oid": "660553526144be9614b2ff00"
+    },
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "admins": [
+    {
+      "$oid": "660553486144be9614b2fefb"
+    }
+  ],
+  "isGroup": true,
+  "isCommunity": false,
+  "Group": {
+    "$oid": "6629d6f897cbf91d0f20c59a"
+  },
+  "createdAt": {
+    "$date": "2024-04-25T04:07:20.579Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T04:07:33.740Z"
+  },
+  "__v": 0,
+  "lastmessage": {
+    "$oid": "6629d70597cbf91d0f20c5b9"
+  }
+}]

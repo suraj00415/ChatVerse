@@ -4,12 +4,12 @@ const userMessageSchema = new Schema(
         participantId: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
-            require: true,
+            required: true,
         },
         messageId: {
             type: mongoose.Schema.ObjectId,
             ref: "Message",
-            require: true,
+            required: true,
         },
         chatId: {
             type: mongoose.Schema.ObjectId,
@@ -33,5 +33,8 @@ const userMessageSchema = new Schema(
     },
     { timestamps: true }
 );
+
+userMessageSchema.index({ participantId: 1 });
+userMessageSchema.index({ messageId: 1 });
 
 export const UserMessage = mongoose.model("UserMessage", userMessageSchema);

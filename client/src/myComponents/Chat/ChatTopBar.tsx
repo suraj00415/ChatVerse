@@ -71,7 +71,7 @@ export default function ChatTopBar({ typing, typingData }) {
     }
   }
   return (
-    <div >
+    <div className="" >
       {currentChat && <div className=' bg-zinc-800 w-full border-b border-zinc-700'>
         <div className='flex justify-between items-center w-full'>
           <div className='flex items-center w-full'>

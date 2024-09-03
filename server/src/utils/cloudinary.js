@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import logger from "./logger.js";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -12,10 +13,10 @@ export const uploadOnCloudinary = async (filePath) => {
         const response = await cloudinary.uploader.upload(filePath, {
             resource_type: "auto",
         });
-        console.log("Files Uploaded on Cloudinary", response?.url);
+        logger.info("Files Uploaded on Cloudinary", response?.url);
         return response;
     } catch (error) {
-        console.log(error);
+        logger.error(error);
         return null;
     }
 };

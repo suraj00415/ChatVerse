@@ -41,10 +41,6 @@ export const messageSlice = apiSlice.injectEndpoints({
         }),
         forwardMessage: builder.mutation({
             query: (formData) => {
-                // const formDataBody = new FormData();
-                // Object.keys(formData).forEach(key => {
-                //     formDataBody.append(key, formData[key]);
-                // });
                 return {
                     url: '/messages/forward-message',
                     method: 'POST',
@@ -54,7 +50,59 @@ export const messageSlice = apiSlice.injectEndpoints({
             },
             invalidatesTags: ["Message", "Chat"]
         }),
+        deleteForMe: builder.mutation({
+            query: (formData) => {
+                return {
+                    url: '/messages/delete-for-me',
+                    method: 'DELETE',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
+        deleteForEveryone: builder.mutation({
+            query: (formData) => {
+                return {
+                    url: '/messages/delete-for-everyone',
+                    method: 'DELETE',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
+        setReadMessage: builder.mutation({
+            query: (formData) => {
+                return {
+                    url: '/messages/set-read-message',
+                    method: 'POST',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
+        setSentMessage: builder.mutation({
+            query: (formData) => {
+                return {
+                    url: '/messages/set-sent-message',
+                    method: 'POST',
+                    body: formData,
+                    formData: true,
+                };
+            },
+            invalidatesTags: ["Message", "Chat"]
+        }),
+        getUnreadMessage: builder.query({
+            query: () => {
+                return {
+                    url: '/messages/get-unread-messages',
+                };
+            },
+            providesTags: ["Message", "Chat"]
+        }),
     })
 })
 
-export const { useGetMessageQuery, useSendMessageMutation, useReplyMessageMutation, useForwardMessageMutation } = messageSlice
+export const { useGetMessageQuery, useGetUnreadMessageQuery, useSetReadMessageMutation, useSetSentMessageMutation, useDeleteForEveryoneMutation, useDeleteForMeMutation, useSendMessageMutation, useReplyMessageMutation, useForwardMessageMutation } = messageSlice

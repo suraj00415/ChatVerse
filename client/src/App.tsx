@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage.tsx"
 import ChatPage from "./pages/ChatPage.tsx"
 import AddPage from "./pages/AddPage.tsx"
 import VerifyPage from "./pages/VerifyPage.tsx"
+import SchedulePage from "./pages/SchedulePage.tsx"
 
 function App() {
   return (
@@ -20,10 +21,10 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<ChatPage />} />
           <Route path="/add" element={<AddPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/verify/:token" element={<VerifyPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
-
       </Route>
     </Routes>
   )

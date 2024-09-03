@@ -1,4 +1,4 @@
-import mongoose, { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId, mongo } from "mongoose";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asynchHandler.js";
 import { Chat } from "../models/chat.model.js";
@@ -7,38 +7,17 @@ import { Message } from "../models/message.model.js";
 import { emitSocket } from "../sockets/socket.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { deleteFile } from "../utils/deleteFiles.js";
+import { UserMessage } from "../models/userMessage.model.js";
+import { agenda } from "../agenda/agenda.js";
 
-export const messageAggregation = () => {
+export const messageAggregation2 = () => {
     return [
         {
             $lookup: {
-                from: "users",
-                foreignField: "_id",
-                localField: "sender",
-                as: "sender",
-                pipeline: [
-                    {
-                        $project: {
-                            username: 1,
-                            email: 1,
-                            avatar: 1,
-                            color: 1,
-                        },
-                    },
-                ],
-            },
-        },
-        {
-            $addFields: {
-                sender: { $first: "$sender" },
-            },
-        },
-        {
-            $lookup: {
                 from: "messages",
-                localField: "replyTo",
+                localField: "messageId",
                 foreignField: "_id",
-                as: "replyTo",
+                as: "message",
                 pipeline: [
                     {
                         $lookup: {
@@ -63,14 +42,52 @@ export const messageAggregation = () => {
                             sender: { $first: "$sender" },
                         },
                     },
+                    {
+                        $lookup: {
+                            from: "messages",
+                            localField: "replyTo",
+                            foreignField: "_id",
+                            as: "replyTo",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "users",
+                                        foreignField: "_id",
+                                        localField: "sender",
+                                        as: "sender",
+                                        pipeline: [
+                                            {
+                                                $project: {
+                                                    username: 1,
+                                                    email: 1,
+                                                    avatar: 1,
+                                                    color: 1,
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                                {
+                                    $addFields: {
+                                        sender: { $first: "$sender" },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $addFields: {
+                            replyTo: {
+                                $first: "$replyTo",
+                            },
+                        },
+                    },
                 ],
             },
         },
         {
             $addFields: {
-                replyTo: {
-                    $first: "$replyTo",
-                },
+                message: { $first: "$message" },
             },
         },
     ];
@@ -102,12 +119,21 @@ export const sendMessage = asyncHandler(async (req, res) => {
         });
         await Promise.all(uploadPromises);
     }
+    const unreadPart = existedChat.participants.filter((participantId) => {
+        if (participantId.toString() !== req?.user?._id.toString()) {
+            return participantId;
+        }
+    });
+    const unreadEntries = unreadPart.map((participantId) => ({
+        participantId,
+    }));
 
     const newMessage = await Message.create({
         content: content || "",
         sender: req?.user?._id,
         attachments,
         chat: new mongoose.Types.ObjectId(chatId),
+        unread: unreadEntries,
     });
 
     const chat = await Chat.findOneAndUpdate(
@@ -119,16 +145,36 @@ export const sendMessage = asyncHandler(async (req, res) => {
         },
         { new: true }
     );
-
-    const messages = await Message.aggregate([
+    let userMessageId = null;
+    const userMessageCreationPromises = existedChat.participants.map(
+        async (participant) => {
+            const userMessageCreate = await UserMessage.create({
+                messageId: newMessage._id,
+                participantId: participant,
+                chatId: new mongoose.Types.ObjectId(chatId),
+            });
+            if (participant.toString() === req?.user?._id.toString()) {
+                userMessageId = userMessageCreate._id;
+            }
+            if (!userMessageCreate) {
+                throw new ApiError(500, "Error creating UserMessage");
+            }
+        }
+    );
+    await Promise.all(userMessageCreationPromises);
+    const messages = await UserMessage.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(newMessage?._id),
+                _id: userMessageId,
             },
         },
-        ...messageAggregation(),
+        ...messageAggregation2(),
     ]);
-
+    if (!messages?.length)
+        throw new ApiError(
+            400,
+            "Something Went Wrong While Aggreatating Message"
+        );
     existedChat?.participants.forEach((participant) => {
         if (participant.toString() === req.user?._id.toString()) return;
         emitSocket(req, participant.toString(), "newMessage", messages[0]);
@@ -136,6 +182,7 @@ export const sendMessage = asyncHandler(async (req, res) => {
     attachmentsFileName.map((path) => {
         deleteFile(path);
     });
+
     return res
         .status(200)
         .json(new ApiResponse(200, "Message Sent SuccessFully", messages[0]));
@@ -155,13 +202,15 @@ export const getAllMessages = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User is not a part of this chat");
     }
 
-    const messages = await Message.aggregate([
+    const messages = await UserMessage.aggregate([
         {
             $match: {
-                chat: new mongoose.Types.ObjectId(chatId),
+                participantId: req?.user?._id,
+                chatId: new mongoose.Types.ObjectId(chatId),
+                isDeleted: false,
             },
         },
-        ...messageAggregation(),
+        ...messageAggregation2(),
         {
             $sort: {
                 createdAt: 1,
@@ -214,7 +263,14 @@ export const sendReplyMessage = asyncHandler(async (req, res) => {
         });
         await Promise.all(uploadPromises);
     }
-
+    const unreadPart = chatExisted.participants.filter((participantId) => {
+        if (participantId.toString() !== req?.user?._id.toString()) {
+            return participantId;
+        }
+    });
+    const unreadEntries = unreadPart.map((participantId) => ({
+        participantId,
+    }));
     const newMessage = await Message.create({
         content,
         attachments,
@@ -222,6 +278,7 @@ export const sendReplyMessage = asyncHandler(async (req, res) => {
         replyTo: messageId,
         sender: req?.user?._id,
         chat: chatId,
+        unread:unreadEntries
     });
 
     const chat = await Chat.findOneAndUpdate(
@@ -234,14 +291,33 @@ export const sendReplyMessage = asyncHandler(async (req, res) => {
         { new: true }
     );
 
-    const messages = await Message.aggregate([
+    chat?.participants?.map(async (participant) => {
+        const usermessagesCreate = await UserMessage.create({
+            messageId: newMessage?._id,
+            participantId: participant,
+            chatId,
+        });
+        if (!usermessagesCreate)
+            throw new ApiError(
+                400,
+                "Something Went Wrong While Creating UserMessage"
+            );
+    });
+
+    const messagesFind = await UserMessage.findOne({
+        messageId: newMessage?._id,
+        participantId: req?.user?._id,
+    });
+
+    const messages = await UserMessage.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(newMessage?._id),
+                _id: messagesFind?._id,
             },
         },
-        ...messageAggregation(),
+        ...messageAggregation2(),
     ]);
+    console.log("Messagses:", messages);
 
     chatExisted?.participants.forEach((participant) => {
         if (participant.toString() === req.user?._id.toString()) return;
@@ -294,13 +370,30 @@ export const forwardMessage = asyncHandler(async (req, res) => {
         chats.map(async (chat) => {
             await Promise.all(
                 messagesExisted.map(async (message) => {
+                    console.log("MessageSender", message?.sender);
+                    console.log("reqUser", req?.user?._id);
+                    console.log(
+                        message?.sender.toString() === req?.user?._id.toString()
+                    );
                     const messageNew = await Message.create({
                         sender: req.user?._id,
                         content: message.content,
                         chat: chat._id,
-                        forwardCount: message.forwardCount + 1 || 1,
-                        forwardSource: message.forwardSource || message.sender,
-                        isForwarded: true,
+                        forwardCount:
+                            message.sender.toString() ===
+                            req?.user?._id.toString()
+                                ? 0
+                                : message.forwardCount + 1 || 1,
+                        forwardSource:
+                            message.sender.toString() ===
+                            req?.user?._id.toString()
+                                ? undefined
+                                : message.forwardSource || message.sender,
+                        isForwarded:
+                            message.sender.toString() ===
+                            req?.user?._id.toString()
+                                ? false
+                                : true,
                         attachments: message.attachments,
                     });
                     if (!messageNew) {
@@ -309,22 +402,34 @@ export const forwardMessage = asyncHandler(async (req, res) => {
                             "Message Not Created Successfully in ForwardMessage"
                         );
                     }
+                    chat?.participants?.map(async (participant) => {
+                        const usermessagesCreate = await UserMessage.create({
+                            messageId: messageNew?._id,
+                            participantId: participant,
+                            chatId: chat?._id,
+                        });
+                        if (!usermessagesCreate)
+                            throw new ApiError(
+                                400,
+                                "Something Went Wrong While Creating UserMessage"
+                            );
+                    });
                     messageId.push(messageNew._id);
                 })
             );
         })
     );
 
-    console.log(messageId);
-    const aggMessage = await Message.aggregate([
+    const aggMessage = await UserMessage.aggregate([
         {
             $match: {
-                _id: {
+                messageId: {
                     $in: messageId,
                 },
+                participantId: req?.user?._id,
             },
         },
-        ...messageAggregation(),
+        ...messageAggregation2(),
     ]);
     if (!aggMessage.length)
         throw new ApiError(
@@ -335,9 +440,7 @@ export const forwardMessage = asyncHandler(async (req, res) => {
         chat.participants.forEach((parrticipantId) => {
             if (parrticipantId.toString() === req.user?._id?.toString()) return;
             aggMessage.forEach((mess, i) => {
-                console.log("Mess Chat", mess?.chat);
-                console.log("chats?._id.toString()", chats?._id?.toString());
-                if (mess?.chat.toString() === chat?._id?.toString()) {
+                if (mess?.chatId?.toString() === chat?._id?.toString()) {
                     emitSocket(
                         req,
                         parrticipantId.toString(),
@@ -348,9 +451,302 @@ export const forwardMessage = asyncHandler(async (req, res) => {
             });
         });
     });
-
     return res.status(200).json(new ApiResponse(200, "fetched", aggMessage));
 });
 
-export const forwardBulkMessage = asyncHandler(async (req, res) => {});
-export const deleteBulkMessage = asyncHandler(async (req, res) => {});
+export const deleteForMe = asyncHandler(async (req, res) => {
+    const { userMessageIds } = req.body;
+    let chatid = null;
+    if (!userMessageIds?.length)
+        throw new ApiError(400, "User Message Ids are Required!!");
+    try {
+        const userMessage = await UserMessage.find({
+            _id: {
+                $in: userMessageIds,
+            },
+        });
+        chatid = userMessage[0]?.chatId;
+        console.log(userMessage);
+    } catch (error) {
+        throw new ApiError(400, "Invalid Message Id");
+    }
+    const deletedUserMessage = await UserMessage.deleteMany({
+        _id: {
+            $in: userMessageIds,
+        },
+    });
+
+    if (!deletedUserMessage)
+        throw new ApiError(
+            500,
+            "Something Went Wrong While Deleting the user message"
+        );
+
+    // const chat = await Chat.findById(chatid);
+    // console.log(chat?.participants);
+
+    // chat?.participants?.forEach((participant) => {
+    //     if (participant.toString === req?.user?._id.toString()) return;
+    //     emitSocket(req, participant, "deleteForMe", userMessageIds);
+    // });
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, "Message Deleted SuccessFully", userMessageIds)
+        );
+});
+export const deleteForEveryone = asyncHandler(async (req, res) => {
+    const { messageIds, chatId } = req.body;
+    if (!chatId) throw new ApiError(404, "Chat ID Not Found");
+    if (!messageIds?.length)
+        throw new ApiError(404, "User Message Ids are Required!!");
+    try {
+        await Message.find({
+            _id: {
+                $in: messageIds,
+            },
+        });
+    } catch (error) {
+        throw new ApiError(400, "Invalid Message Id");
+    }
+    const chat = await Chat.findById(chatId);
+    if (!chat) throw new ApiError(404, "Chat Not Found");
+    const updatedMessage = await Message.updateMany(
+        {
+            _id: {
+                $in: messageIds,
+            },
+        },
+        {
+            $set: {
+                isDeletedBySenderToAll: true,
+                deletedAlert: "This Message Was Deleted",
+                content: "",
+                attachments: [],
+            },
+        }
+    );
+    const messageIdsWithObject = messageIds.map(
+        (id) => new mongoose.Types.ObjectId(id)
+    );
+    console.log("ObjectId", messageIdsWithObject);
+    const userMessageUpdated = await UserMessage.aggregate([
+        {
+            $match: {
+                messageId: {
+                    $in: messageIdsWithObject,
+                },
+                participantId: req?.user?._id,
+            },
+        },
+        ...messageAggregation2(),
+    ]);
+    chat.participants.forEach((participant) => {
+        if (participant.toString() === req?.user?._id?.toString()) return;
+        emitSocket(
+            req,
+            participant.toString(),
+            "deleteForEveryone",
+            userMessageUpdated
+        );
+    });
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Message for Everyone Deleted SuccessFully",
+                userMessageUpdated
+            )
+        );
+});
+
+export const addReaction = asyncHandler(async (req, res) => {});
+export const removeReaction = asyncHandler(async (req, res) => {});
+
+export const scheduleMessage = asyncHandler(async (req, res) => {
+    const { content, chatId, delay } = req.body;
+    if (!content || !chatId || !delay)
+        throw new ApiError(400, "Content,ChatId,Delay Fields are Required");
+
+    const job = await agenda.every(delay, "send scheduled message", {
+        content,
+        chatId,
+        userId: req?.user?._id?.toString(),
+    });
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, "Message scheduled SuccessFully", job));
+});
+
+export const setReadMessage = asyncHandler(async (req, res) => {
+    const { messageIds } = req.body;
+    if (!messageIds?.length)
+        throw new ApiError(400, "MessageIds and ChatId Are Required");
+    try {
+        await Message.find({
+            _id: {
+                $in: messageIds,
+            },
+        });
+    } catch (error) {
+        throw new ApiError(400, "Invalid MessageIds");
+    }
+    const userId = new mongoose.Types.ObjectId(req?.user?._id);
+    const currentTime = Date.now();
+
+    const messageUpdated = await Promise.all(
+        messageIds?.map(async (messageId) => {
+            const message = await Message.findById(messageId);
+            if (message) {
+                const alreadySent = message.read.some((s) =>
+                    s.participantId.equals(userId)
+                );
+                if (!alreadySent) {
+                    message.read.push({
+                        participantId: userId,
+                        time: currentTime,
+                    });
+                    message.unread = message.unread.filter(
+                        (u) => !u.participantId.equals(userId)
+                    );
+                    return message.save();
+                }
+            }
+        })
+    );
+    if (!messageUpdated)
+        throw new ApiError(
+            500,
+            "Something went Wrong While Updating the Read message"
+        );
+    const objConvertedMessageIds = messageIds?.map(
+        (id) => new mongoose.Types.ObjectId(id)
+    );
+    const message = await UserMessage.aggregate([
+        {
+            $match: {
+                participantId: new mongoose.Types.ObjectId(req?.user?._id),
+                messageId: {
+                    $in: objConvertedMessageIds,
+                },
+            },
+        },
+        ...messageAggregation2(),
+    ]);
+    if (!message.length)
+        throw new ApiError(500, "Something Wrong While Fetching Read Messages");
+
+    message.forEach((msg) => {
+        emitSocket(
+            req,
+            msg.message?.sender?._id.toString(),
+            "statusMessage",
+            msg
+        );
+    });
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, "Read Message SuccessFully Updated", message)
+        );
+});
+
+export const setSentMessage = asyncHandler(async (req, res) => {
+    const { messageIds } = req.body;
+    if (!messageIds?.length)
+        throw new ApiError(400, "MessageIds and ChatId Are Required");
+    try {
+        await Message.find({
+            _id: {
+                $in: messageIds,
+            },
+        });
+    } catch (error) {
+        throw new ApiError(400, "Invalid MessageIds");
+    }
+    const userId = new mongoose.Types.ObjectId(req?.user?._id);
+    const currentTime = Date.now();
+
+    const messageUpdated = await Promise.all(
+        messageIds?.map(async (messageId) => {
+            const message = await Message.findById(messageId);
+            if (message) {
+                const alreadySent = message.sent.some((s) =>
+                    s.participantId.equals(userId)
+                );
+                if (!alreadySent) {
+                    message.sent.push({
+                        participantId: userId,
+                        time: currentTime,
+                    });
+                    return message.save();
+                }
+            }
+        })
+    );
+    if (!messageUpdated)
+        throw new ApiError(
+            500,
+            "Something went Wrong While Updating the Read message"
+        );
+    const objConvertedMessageIds = messageIds?.map(
+        (id) => new mongoose.Types.ObjectId(id)
+    );
+    const message = await UserMessage.aggregate([
+        {
+            $match: {
+                participantId: new mongoose.Types.ObjectId(req?.user?._id),
+                messageId: {
+                    $in: objConvertedMessageIds,
+                },
+            },
+        },
+        ...messageAggregation2(),
+    ]);
+    if (!message.length)
+        throw new ApiError(500, "Something Wrong While Fetching Read Messages");
+
+    message.forEach((msg) => {
+        emitSocket(
+            req,
+            msg.message?.sender?._id.toString(),
+            "statusMessage",
+            msg
+        );
+    });
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, "Read Message SuccessFully Updated", message)
+        );
+});
+
+export const getUnreadMessages = asyncHandler(async (req, res) => {
+    const unreadMessages = await UserMessage.aggregate([
+        {
+            $match: {
+                participantId: req?.user?._id,
+            },
+        },
+        ...messageAggregation2(),
+        {
+            $match: {
+                "message.unread.participantId": req?.user?._id,
+            },
+        },
+    ]);
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "Unread Messages Fetched SuccessFully",
+                unreadMessages
+            )
+        );
+});

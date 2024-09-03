@@ -6,7 +6,8 @@ const initialState = {
     replyMessage: null,
     isReplyOpen: false,
     selectedMessage: [],
-    isSelectionOpen: false
+    selectedUserMessage: [],
+    isSelectionOpen: false,
 }
 
 const messageSlice = createSlice({
@@ -33,11 +34,14 @@ const messageSlice = createSlice({
         },
         setIsSelectionOpen: (state, action) => {
             state.isSelectionOpen = action.payload
-        }
+        },
+        setSelectedUserMessage: (state, action) => {
+            state.selectedUserMessage = action.payload
+        },
     }
 })
 
-export const { setCurrentChatMessasges, setUreadMessage, setFilterUnreadMessge, setReplyMessage, setReplyOpen, setSelectedMessage, setIsSelectionOpen } = messageSlice.actions
+export const { setSelectedUserMessage,setCurrentChatMessasges, setUreadMessage, setFilterUnreadMessge, setReplyMessage, setReplyOpen, setSelectedMessage, setIsSelectionOpen } = messageSlice.actions
 
 export default messageSlice.reducer
 
@@ -46,5 +50,6 @@ export const selectUnreadMessage = (state: any) => state.message.unreadMessage
 export const selectReplyMessage = (state: any) => state.message.replyMessage
 export const selectIsReplyOpen = (state: any) => state.message.isReplyOpen
 export const selectSelectedMessage = (state: any) => state.message.selectedMessage
+export const selectSelectedUserMessage = (state: any) => state.message.selectedUserMessage
 export const selectIsSelectionOpen = (state: any) => state.message.isSelectionOpen
 

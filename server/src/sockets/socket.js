@@ -1,6 +1,7 @@
+import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import jwt from "jsonwebtoken";
+import logger from "../utils/logger.js";
 
 export const initializeSocket = async (io) => {
     return io.on("connection", async (socket) => {
@@ -17,7 +18,7 @@ export const initializeSocket = async (io) => {
             if (!user) throw new ApiError(404, "User Does Not Exists");
             socket.user = user;
 
-            console.log(
+            logger.info(
                 "User Connected 👌 ",
                 socket.id + " " + socket?.user?.name
             );
@@ -51,7 +52,7 @@ export const initializeSocket = async (io) => {
 
             // disconnecting the user
             socket.on("disconnect", () => {
-                console.log(
+                logger.info(
                     "User Disconnected ⚠️ ",
                     socket.id + " ⚠️  " + socket?.user?.name
                 );
@@ -68,7 +69,8 @@ export const initializeSocket = async (io) => {
 };
 
 export const emitSocket = (req, chatId, eventName, payload) => {
-    console.log("socket-chat-new emited");
+    logger.info("socket-chat-new emited :"+ eventName);
     req.app.get("io").in(chatId).emit(eventName, payload);
-    console.log("socket-chat-new completed");
+    logger.info("socket-chat-new completed :"+ eventName);
+
 };

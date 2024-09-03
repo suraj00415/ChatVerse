@@ -9,7 +9,7 @@ function emojiToUnified(emoji) {
 }
 
 function isEmoji(str) {
-    for (let i = 0; i < str.length; i++) {
+    for (let i = 0; i < str?.length; i++) {
         if (str.charCodeAt(i) > 127) {
             return true;
         }
@@ -24,7 +24,7 @@ function isEmoji2(str) {
 const URL_REGEX = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/gm;
 
 export const MessageWithEmojis = ({ message, isSmall = true, isHeading = false, isReplyContent = false }) => {
-    const parts = message.split(' ').map((part, index) => {
+    const parts = message?.split(' ')?.map((part, index) => {
         if (part.match(URL_REGEX)) {
             return (
                 <a key={index} target='_blank' rel='noopener noreferrer' className='text-sky-400' href={part}>
@@ -53,7 +53,7 @@ export const MessageWithEmojis = ({ message, isSmall = true, isHeading = false, 
         }
     });
 
-    if (isEmoji(message) && message.length === 2 && !isSmall) {
+    if (isEmoji(message) && message?.length === 2 && !isSmall) {
         const emojiUnified = emojiToUnified(message);
         return (
             <Emoji
