@@ -4,7 +4,7 @@ import express from "express";
 import { createServer } from "http";
 import morgan from "morgan";
 import { Server } from "socket.io";
-import { errorHandler } from "./middlewares/error.middlewar.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 import { initializeSocket } from "./sockets/socket.js";
 import { agenda } from "./agenda/agenda.js";
 import logger from "./utils/logger.js";
@@ -43,7 +43,7 @@ app.use(
                     userAgent: msg[5],
                     date: msg[6],
                 };
-                logger.info(JSON.stringify(logObject));
+                logger.http(JSON.stringify(logObject));
             },
         },
     })

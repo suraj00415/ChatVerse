@@ -1,0 +1,205 @@
+[{
+  "_id": {
+    "$oid": "660428ca9bda13e9b712477d"
+  },
+  "name": "Manish Shah",
+  "email": "surajsa1858@gmail.com",
+  "username": "manish",
+  "password": "$2b$10$emDtI/Ov9fXcAJB0DMp6S.iq6pkck5KPYM.AGOm2Cn2Kpi.f1NBgG",
+  "avatar": "https://res.cloudinary.com/dfu2zsjpw/image/upload/v1713139977/bumatx1ubguktva8y3vj.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1711548615/oiy91ndu1pewdilhbuvj.jpg",
+  "links": [],
+  "isVerified": false,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjA0MjhjYTliZGExM2U5YjcxMjQ3N2QiLCJlbWFpbCI6InN1cmFqc2ExODU4QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoibWFuaXNoIiwiaWF0IjoxNzEzMDk5MDcxLCJleHAiOjE3MTM5NjMwNzF9.GgGiq6_3V0RlT_xeMn9nxctAcamLqV4vSpg_s20fzPc",
+  "emailVerifyToken": "327d8eccce249a7ab5c076a287d907a08fd8b7d9f34264aace099455c45404c3",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-03-27T14:10:18.475Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-14T12:51:11.194Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-03-27T14:20:18.567Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "660438656bda2b994d5f385f"
+  },
+  "name": "Suraj Shah",
+  "email": "surajsa1858@gmail.com",
+  "username": "suraj",
+  "password": "$2b$10$gMOfmssZ/j.DhPvdcBFiSO4fty2TGdG3B9GcNVShpzY5rN.9IcxiO",
+  "avatar": "https://res.cloudinary.com/dfu2zsjpw/image/upload/v1713139977/fvpncecgm1opx9fxbv4r.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1711552609/njwgytszxpls4tp0dckc.jpg",
+  "links": [],
+  "isVerified": false,
+  "emailVerifyToken": "f515cd9aa2309f968641a8b48850c01f24a6ddb7e1dba0d519060bef20a6122c",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-03-27T15:16:53.032Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T05:05:45.379Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-03-27T15:26:53.154Z"
+  },
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjA0Mzg2NTZiZGEyYjk5NGQ1ZjM4NWYiLCJlbWFpbCI6InN1cmFqc2ExODU4QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoic3VyYWoiLCJpYXQiOjE3MTQwMjE1NDUsImV4cCI6MTcxNDg4NTU0NX0.s2OO9obiDcSmGq9ZWLUWnc6htrXsNKuNDoeBsPdQXAs"
+},
+{
+  "_id": {
+    "$oid": "6605532e6144be9614b2fef0"
+  },
+  "name": "Jeet Shekhda",
+  "email": "surajsa1858@gmail.com",
+  "username": "jeet",
+  "password": "$2b$10$ooT51cgk64oh7155y9BMEuJuIn5eWbmX7EsAqrwIn8Mh07ZjWKNR6",
+  "avatar": "https://res.cloudinary.com/dfu2zsjpw/image/upload/v1713139977/yfq0pkpwu9x7lnbmrsqq.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1711625005/prs9orcpxkw7q7jn3qxr.jpg",
+  "links": [],
+  "isVerified": false,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjA1NTMyZTYxNDRiZTk2MTRiMmZlZjAiLCJlbWFpbCI6InN1cmFqc2ExODU4QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiamVldCIsImlhdCI6MTcxMzE5ODYwNywiZXhwIjoxNzE0MDYyNjA3fQ.vsLPA3_T_sL-o6VRb83oszj816tCpFq-YNfUtyGkiog",
+  "emailVerifyToken": "3f600a08c38114b21fc0d98eab1fe916ec03dd80be65f8b1d71c994db2247599",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-03-28T11:23:26.756Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-15T16:30:07.070Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-03-28T11:33:26.879Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6605533a6144be9614b2fef5"
+  },
+  "name": "Dev Detroja",
+  "email": "surajsa1858@gmail.com",
+  "username": "dev",
+  "password": "$2b$10$eJc3D1S39q5f3u7nJjt35ObZI1kEwu1XWjTHcEg.7OcdjNDQfMPlq",
+  "avatar": "https://res.cloudinary.com/dfu2zsjpw/image/upload/v1713140557/h3shbew9eiaf43fb0p6a.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1711625018/trusrg4kknfwzbly9xwz.jpg",
+  "links": [],
+  "isVerified": false,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjA1NTMzYTYxNDRiZTk2MTRiMmZlZjUiLCJlbWFpbCI6InN1cmFqc2ExODU4QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiZGV2IiwiaWF0IjoxNzExODE4NTY3LCJleHAiOjE3MTI2ODI1Njd9.yrldJBIaBYL-_yuxqGiIRaxjv2IYmcVbK2BzG3Gas-M",
+  "emailVerifyToken": "61f0f9ea349a818ca41d1522ae29993b6962cade822a7bcd6393a273e7b6f126",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-03-28T11:23:38.956Z"
+  },
+  "updatedAt": {
+    "$date": "2024-03-30T17:09:27.948Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-03-28T11:33:39.057Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "660553486144be9614b2fefb"
+  },
+  "name": "Jainam Bhatt",
+  "email": "surajsa1858@gmail.com",
+  "username": "jainam",
+  "password": "$2b$10$gxsnN3jKaes/1TUz2U8Yu.L3JZkX1X7.ToOwsz28hs2sumqAlCbMG",
+  "avatar": "https://res.cloudinary.com/dfu2zsjpw/image/upload/v1713139978/pjjfpesxnxuiees5y5b3.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1711625031/biinsmmnsogwctvygcid.jpg",
+  "links": [],
+  "isVerified": false,
+  "emailVerifyToken": "b845f97f59e3683dd84f7fbddc03de091fb7a02e622b16bd20f2c34b37b67cd8",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-03-28T11:23:52.722Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T04:20:21.579Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-03-28T11:33:52.862Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "660553526144be9614b2ff00"
+  },
+  "name": "Parthivsinh Vaghela",
+  "email": "surajsa1858@gmail.com",
+  "username": "parthiv",
+  "password": "$2b$10$/trkuDbkggxKdu6Od4AOqehf7SUdjPzjuO2JfOaEpH20b3d9lfgvC",
+  "avatar": "https://res.cloudinary.com/dfu2zsjpw/image/upload/v1713139977/do55xxsj1bu8vohbsvdu.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1711625042/z2pz5ur1bohrxz2lufhx.jpg",
+  "links": [],
+  "isVerified": false,
+  "emailVerifyToken": "e38379074a04ab7866ef456d4fdb9752db5ab6b667e961cd6f8e4e5547ba2cfe",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-03-28T11:24:02.782Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-20T11:01:44.448Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-03-28T11:34:02.890Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66265dd7251d1d2345ff7ab0"
+  },
+  "name": "Prachi Shah",
+  "email": "prachi@gmail.com",
+  "username": "prachi",
+  "password": "$2b$10$KQBwotT5JMRdoNJDN6ERLuiTrQM.Ij3FzYvMsrAGTmhT0eR29HUI2",
+  "avatar": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1713790421/fvenr33hdrudtchksq6r.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1713790423/dz0i58hlcii7ytbjhccc.jpg",
+  "links": [],
+  "isVerified": false,
+  "emailVerifyToken": "df7b838cc8546188ec5154c213092f928cb7611fbc34dcbe30e866422290d4f5",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-04-22T12:53:43.950Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-25T04:38:18.962Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-04-22T13:03:44.064Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "66265dfd251d1d2345ff7acc"
+  },
+  "name": "Deepali Shah",
+  "email": "deepali@gmail.com",
+  "username": "deepali",
+  "password": "$2b$10$b41L9gUKcBUIp29fojJU3OfAVFw3ZVtxhyWSAfodfai0gAl/7dhU2",
+  "avatar": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1713790459/ipigcyb2hzg6uu2eoyeq.jpg",
+  "coverImage": "http://res.cloudinary.com/dfu2zsjpw/image/upload/v1713790461/arauvulld2qxlw1wnc90.jpg",
+  "links": [],
+  "isVerified": false,
+  "refreshToken": null,
+  "emailVerifyToken": "cc7f596c428ccfdeb94bdd23918c1c7b0fb24bb17c206b7b15ea7aa99da7ca81",
+  "forgotPasswordToken": null,
+  "createdAt": {
+    "$date": "2024-04-22T12:54:21.756Z"
+  },
+  "updatedAt": {
+    "$date": "2024-04-22T12:54:21.850Z"
+  },
+  "__v": 0,
+  "emailVerifyTokenExpiry": {
+    "$date": "2024-04-22T13:04:21.849Z"
+  }
+}]

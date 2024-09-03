@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
-import app from "./app.js";
 import { httpServer } from "./app.js";
-import { port } from "./utils/constants.js";
 import connectDB from "./utils/connectDb.js";
+import { port } from "./utils/constants.js";
 import logger from "./utils/logger.js";
 
 dotenv.config({

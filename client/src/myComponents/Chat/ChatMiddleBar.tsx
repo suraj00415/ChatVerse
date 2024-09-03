@@ -11,7 +11,7 @@ import "./opacity.css";
 import Spinners from './Spinners';
 import chatFiller from '/assets/chatting-33.svg';
 import chatFiller2 from '/assets/conversation-13.svg';
-
+import ChatPolling from './ChatPolling';
 
 
 
@@ -78,9 +78,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
       const isPrevSender = prevSender === data?.message?.sender?._id;
       if (!isPrevSender) prevSender = data?.message?.sender?._id;
       const checkHandler = selectedMessages.includes(data?.message?._id);
-
       return (
-
         <div key={data?.message?._id}>
           {newDate && (
             <div className='flex justify-center sticky top-3 my-2 mt-4 z-20'>
@@ -105,39 +103,41 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
             <div className={`${isPrevSender && !newDate ? "" : "mt-3"} w-full`}>
               <div className='flex flex-col'>
                 <div className={`${isSender ? 'self-end' : 'self-start'}`} key={data?.message?._id + 2}>
-                  {data?.message?.attachments && data?.message?.attachments?.length == 0 && <ChatSimple
-                    isForwarded={data?.message?.isForwarded}
-                    message={data?.message?.content}
-                    isSender={isSender}
-                    isGroup={currentChat?.isGroup}
-                    senderName={data?.message?.sender?.username}
-                    timeAgo={data?.message?.createdAt}
-                    newDate={newDate}
-                    isPrevSender={isPrevSender && !newDate}
-                    color={data?.message?.sender?.color}
-                    messageData={data}
-                    isReply={data?.message?.isReply || false}
-                    replyToName={data?.message?.replyTo?.sender?.username || ""}
-                    replyToColor={data?.message?.replyTo?.sender?.color || ""}
-                    replyToContent={data?.message?.replyTo?.content || ""}
-                  />}
-                  {data?.message?.attachments && data?.message?.attachments?.length > 0 && <ChatImage
-                    isForwarded={data?.message?.isForwarded}
-                    message={data?.message?.content}
-                    isSender={isSender}
-                    isGroup={currentChat?.isGroup}
-                    senderName={data?.message?.sender?.username}
-                    timeAgo={data?.message?.createdAt}
-                    newDate={newDate}
-                    isPrevSender={isPrevSender && !newDate}
-                    color={data?.message?.sender?.color}
-                    messageData={data?.message}
-                    isReply={data?.message?.isReply || false}
-                    replyToName={data?.message?.replyTo?.sender?.username || ""}
-                    replyToColor={data?.message?.replyTo?.sender?.color || ""}
-                    replyToContent={data?.message?.replyTo?.content || ""}
-                    images={data?.message?.attachments}
-                  />
+                  {data?.message?.attachments && data?.message?.attachments?.length == 0 &&
+                    <ChatSimple
+                      isForwarded={data?.message?.isForwarded}
+                      message={data?.message?.content}
+                      isSender={isSender}
+                      isGroup={currentChat?.isGroup}
+                      senderName={data?.message?.sender?.username}
+                      timeAgo={data?.message?.createdAt}
+                      newDate={newDate}
+                      isPrevSender={isPrevSender && !newDate}
+                      color={data?.message?.sender?.color}
+                      messageData={data}
+                      isReply={data?.message?.isReply || false}
+                      replyToName={data?.message?.replyTo?.sender?.username || ""}
+                      replyToColor={data?.message?.replyTo?.sender?.color || ""}
+                      replyToContent={data?.message?.replyTo?.content || ""}
+                    />}
+                  {data?.message?.attachments && data?.message?.attachments?.length > 0 &&
+                    <ChatImage
+                      isForwarded={data?.message?.isForwarded}
+                      message={data?.message?.content}
+                      isSender={isSender}
+                      isGroup={currentChat?.isGroup}
+                      senderName={data?.message?.sender?.username}
+                      timeAgo={data?.message?.createdAt}
+                      newDate={newDate}
+                      isPrevSender={isPrevSender && !newDate}
+                      color={data?.message?.sender?.color}
+                      messageData={data?.message}
+                      isReply={data?.message?.isReply || false}
+                      replyToName={data?.message?.replyTo?.sender?.username || ""}
+                      replyToColor={data?.message?.replyTo?.sender?.color || ""}
+                      replyToContent={data?.message?.replyTo?.content || ""}
+                      images={data?.message?.attachments}
+                    />
                   }
                 </div>
               </div>
@@ -166,6 +166,7 @@ export default function ChatMiddleBar({ isMessageLoading, isMessageFetching }) {
           <div className='mb-2'>
             {!isMessageFetching && !isMessageLoading && currentChatMessage && currentChatMessage?.length > 0 && renderMessage}
             {isMessageFetching && <Spinners />}
+            {/* <ChatPolling /> */}
           </div>
         </div>
       </div>

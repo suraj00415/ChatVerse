@@ -2,8 +2,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { selectCurrentToken, selectCurrentUser } from '@/features/auth/authSlice'
 import { useGetAllChatQuery } from '@/features/chat/chatApi'
 import { selectAllChats, selectCurrentChat, selectSearchChats, setAllChat, setCurrentChat, setOtherParicipantChat, setSearchChats } from '@/features/chat/chatSlice'
-import { useGetMessageQuery } from '@/features/messages/messageApi'
-import { selectCurrentChatMessages, selectUnreadMessage, setCurrentChatMessasges, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage, setUreadMessage } from '@/features/messages/messageSlice'
+import { useGetMessageQuery, useGetUnreadMessageQuery, useSetReadMessageMutation, useSetSentMessageMutation } from '@/features/messages/messageApi'
+import { selectCurrentChatMessages, selectUnreadMessage, setCurrentChatMessasges, setFilterUnreadMessge, setIsSelectionOpen, setReplyMessage, setReplyOpen, setSelectedMessage, setUreadMessage } from '@/features/messages/messageSlice'
 import ChatBottomBar from '@/myComponents/Chat/ChatBottomBar'
 import ChatHeading from '@/myComponents/Chat/ChatHeading'
 import ChatHeadingTop from '@/myComponents/Chat/ChatHeadingTop'
@@ -36,10 +36,18 @@ export default function ChatPage() {
     const currentMessage = useSelector(selectCurrentChatMessages)
     const searchChats = useSelector(selectSearchChats)
     const unreadMessage = useSelector(selectUnreadMessage)
-    // const [isChange, setIsChange] = useState(false)
     const [deleteForEveryoneData, setDeleteForEveryoneData] = useState([])
-
+    const { data: unreadMessageFetch, refetch: unreadRefetch } = useGetUnreadMessageQuery(null)
+    const [readMessage] = useSetReadMessageMutation()
+    const [sentMessage] = useSetSentMessageMutation()
     const [socket, setSocket] = useState<ReturnType<typeof socketio> | null>(null)
+    const [statusMessage, setStatusMessage] = useState([])
+    const [isConnected, setIsConnected] = useState(false)
+    useEffect(() => {
+        console.log("Unread Message:", unreadMessageFetch)
+        unreadRefetch()
+        dispatch(setFilterUnreadMessge(unreadMessageFetch?.data))
+    }, [unreadMessageFetch])
 
     useEffect(() => {
         console.log("Is Loading ", isMessageLoading)
@@ -69,9 +77,7 @@ export default function ChatPage() {
         })
         dispatch(setSearchChats(searchChat))
     }, [searchInputValue, chat])
-    // useEffect(() => {
-    //     console.log("current Chat Message:", currentMessage)
-    // }, [newMessage, isChange])
+
     useEffect(() => {
         if (newMessage) {
             dispatch(setCurrentChatMessasges([...currentMessage, newMessage]))
@@ -104,6 +110,36 @@ export default function ChatPage() {
             dispatch(setCurrentChatMessasges(deletedChatMessages))
         }
     }, [deleteForEveryoneData])
+    useEffect(() => {
+        console.log("Status Edited Called")
+        if (statusMessage) {
+            const statusEditedMessages = currentMessage?.map((msg) => {
+                if (statusMessage?.messageId === msg?.messageId) {
+                    return { ...msg, ...statusMessage }
+                }
+                return msg
+            })
+            console.log("Status Edited Message: ", statusEditedMessages)
+            dispatch(setCurrentChatMessasges(statusEditedMessages))
+        }
+
+    }, [statusMessage])
+    const connectionFunction = async () => {
+        try {
+            const messageIds = unreadMessageFetch?.data?.map((d) => d?.messageId)
+            console.log(messageIds)
+            if (messageIds?.length) {
+                await sentMessage({ messageIds })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        if (isConnected) {
+            connectionFunction()
+        }
+    }, [isConnected])
 
     const initSocket = () => {
         return socketio("http://localhost:4000", {
@@ -114,11 +150,32 @@ export default function ChatPage() {
         })
     }
 
-    const newMessageHandler = (data) => {
+    const newMessageHandler = async (data) => {
         if (currentChat?._id !== data?.message?.chat) {
             dispatch(setUreadMessage(data))
+            console.log("Data Unread But Sent", data)
+            try {
+                const messageIds = [data?.messageId]
+                const dataSent = {
+                    messageIds
+                }
+                console.log("Data Sent:", dataSent)
+                await sentMessage(dataSent)
+            } catch (error) {
+                console.log(error)
+            }
         } else {
             setNewMessage(data)
+            try {
+                const messageIds = [data?.messageId]
+                const dataSent = {
+                    messageIds
+                }
+                await sentMessage(dataSent)
+                await readMessage(dataSent)
+            } catch (error) {
+                console.log(error)
+            }
         }
         console.log("data", data)
         console.log("message handler Current Chat:", currentMessage)
@@ -142,10 +199,17 @@ export default function ChatPage() {
             setNewChat([data])
         }
     }
+    const onConnectionHandler = async (data) => {
+        console.log("Connected.................")
+        setIsConnected(true)
+    }
     const deleteForEveryoneHandler = (data) => {
         setDeleteForEveryoneData(data)
     }
-
+    const statusMessageHandler = (data) => {
+        setStatusMessage(data)
+        console.log("StatusMessage:", data)
+    }
     const formatTime = (time) => {
         if (!time) return ""
         const mongoDate = new Date(time)
@@ -161,20 +225,19 @@ export default function ChatPage() {
             socket?.emit("joinUser", c?._id)
         })
     }, [chat, chatId, token, socket, currentChat])
-    const newMessageHandler2 = (data) => {
-        console.log("Schedule Message:", data)
-    }
 
     useEffect(() => {
         socket?.on("newMessage", newMessageHandler)
-        socket?.on("newMessage2", newMessageHandler2)
+        socket?.on("connected", onConnectionHandler)
+        socket?.on("statusMessage", statusMessageHandler)
         socket?.on("emitStartTyping", handleStartTyping)
         socket?.on("emitStopTyping", handleStopTyping)
         socket?.on("newChat", newChatHandler)
         socket?.on("deleteForEveryone", deleteForEveryoneHandler)
         return () => {
             socket?.off("newMessage", newMessageHandler)
-            socket?.off("newMessage", newMessageHandler2)
+            socket?.off("connected", onConnectionHandler)
+            socket?.off("statusMessage", statusMessageHandler)
             socket?.off("emitStartTyping", handleStartTyping)
             socket?.off("emitStopTyping", handleStopTyping)
             socket?.off("newChat", newChatHandler)
